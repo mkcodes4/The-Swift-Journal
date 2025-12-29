@@ -1,0 +1,47 @@
+{
+  "analysis_method": "RoBERTa (Twitter RoBERTa Base Sentiment Latest)",
+  "total_songs": 178,
+  "total_albums": 13,
+  "year_range": "2006-2025",
+  "roberta_sentiment_analysis": {
+    "sentiment_distribution": {
+      "neutral": 95,
+      "negative": 49,
+      "positive": 34
+    },
+    "average_confidence": -0.044075280898876405,
+    "average_compound": -0.04970449438202247,
+    "compound_range": [
+      -0.8136,
+      0.9391
+    ]
+  },
+  "most_positive_song": {
+    "title": "Starlight",
+    "album": "Red",
+    "year": 2012,
+    "roberta_label": "positive",
+    "roberta_compound": 0.9391,
+    "confidence": 0.9391
+  },
+  "most_negative_song": {
+    "title": "Mean",
+    "album": "Speak Now",
+    "year": 2010,
+    "roberta_label": "negative",
+    "roberta_compound": -0.8136,
+    "confidence": -0.8136
+  },
+  "top_keywords": {
+    "never": 341,
+    "love": 297,
+    "time": 265,
+    "baby": 156,
+    "night": 121,
+    "stay": 111,
+    "man": 88,
+    "heart": 82,
+    "girl": 80,
+    "forever": 73
+  }
+}
