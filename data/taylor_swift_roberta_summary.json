@@ -1,16 +1,16 @@
 {
   "analysis_method": "RoBERTa (Twitter RoBERTa Base Sentiment Latest)",
-  "total_songs": 178,
-  "total_albums": 13,
-  "year_range": "2006-2025",
+  "total_songs": 179,
+  "total_albums": 14,
+  "year_range": "2006-2026",
   "roberta_sentiment_analysis": {
     "sentiment_distribution": {
-      "neutral": 95,
+      "neutral": 96,
       "negative": 49,
       "positive": 34
     },
-    "average_confidence": -0.044075280898876405,
-    "average_compound": -0.04970449438202247,
+    "average_confidence": -0.040841899441340784,
+    "average_compound": -0.0494268156424581,
     "compound_range": [
       -0.8136,
       0.9391
@@ -35,11 +35,11 @@
   "top_keywords": {
     "never": 341,
     "love": 297,
-    "time": 265,
+    "time": 266,
     "baby": 156,
     "night": 121,
     "stay": 111,
-    "man": 88,
+    "man": 90,
     "heart": 82,
     "girl": 80,
     "forever": 73

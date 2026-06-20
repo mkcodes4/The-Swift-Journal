@@ -134,6 +134,17 @@ export default function Home() {
       hoverInfo: 'Coming Soon...',
       image: 'https://upload.wikimedia.org/wikipedia/en/f/f4/Taylor_Swift_%E2%80%93_The_Life_of_a_Showgirl_%28album_cover%29.png',
       spotifyUrl: 'https://open.spotify.com/album/1W57oNaAkGObOQKBTxg4e9'
+    },
+    {
+      name: 'Toy Story 5',
+      acronym: 'TS5',
+      year: '2026',
+      description: 'Animated adventure and happy reunions',
+      colors: 'from-blue-400 to-yellow-300',
+      gradient: 'from-blue-400/80 to-yellow-300/80',
+      hoverInfo: 'Newest Release: I Knew It, I Knew You',
+      image: 'https://m.media-amazon.com/images/M/MV5BMjA0NzYwODg4M15BMl5BanBnXkFtZTgwMDM2MzE4OTE@._V1_.jpg',
+      spotifyUrl: '#'
     }
   ];
 
@@ -157,10 +168,10 @@ export default function Home() {
     {
       icon: <TrendingUp className="w-8 h-8" />,
       title: 'Era Timeline',
-      description: 'Visualize lyrical trends and thematic shifts across 19 years of music',
+      description: 'Visualize lyrical trends and thematic shifts across 20 years of music',
       href: '/trends',
       color: 'from-orange-500 to-red-500',
-      era: '2006-2025'
+      era: '2006-2026'
     }
   ];
 
@@ -176,21 +187,21 @@ export default function Home() {
               <Sparkles className="absolute -top-2 -right-2 w-6 h-6 text-pink-500 animate-pulse" />
             </div>
           </div>
-          
+
           <h1 className="text-7xl font-bold mb-6">
             <span className="bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 bg-clip-text text-transparent">
               The Swift Journal
             </span>
           </h1>
-          
+
           <p className="text-2xl text-gray-700 mb-8 max-w-3xl mx-auto leading-relaxed">
-            Explore <span className="text-purple-600 font-semibold">178 songs</span> across 
-            <span className="text-pink-600 font-semibold"> 12 albums</span> with AI-powered 
+            Explore <span className="text-purple-600 font-semibold">179 songs</span> across
+            <span className="text-pink-600 font-semibold"> 14 albums</span> with AI-powered
             sentiment analysis and interactive visualizations
           </p>
-          
+
           <div className="flex gap-4 justify-center flex-wrap mb-12">
-            <Link 
+            <Link
               href="/search"
               className="group bg-gradient-to-r from-purple-600 to-pink-600 text-white px-8 py-4 rounded-2xl font-semibold hover:shadow-2xl hover:scale-105 transition-all duration-300 flex items-center gap-3 shadow-lg"
             >
@@ -198,7 +209,7 @@ export default function Home() {
               Start Exploring
               <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" />
             </Link>
-            <Link 
+            <Link
               href="/sentiment"
               className="group border-2 border-purple-600 text-purple-600 px-8 py-4 rounded-2xl font-semibold hover:bg-purple-600 hover:text-white transition-all duration-300 flex items-center gap-3"
             >
@@ -210,9 +221,9 @@ export default function Home() {
           {/* Quick Stats */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-2xl mx-auto">
             {[
-              { number: '178', label: 'Songs', emoji: '🎵' },
-              { number: '12', label: 'Albums', emoji: '💿' },
-              { number: '19', label: 'Years', emoji: '📅' },
+              { number: '179', label: 'Songs', emoji: '🎵' },
+              { number: '14', label: 'Albums', emoji: '💿' },
+              { number: '20', label: 'Years', emoji: '📅' },
               { number: 'RoBERTa', label: 'AI Analysis', emoji: '🧠' }
             ].map((stat, index) => (
               <div key={index} className="bg-white/90 backdrop-blur-sm border border-white/40 shadow-xl rounded-2xl p-4 text-center transition-all duration-500 hover:scale-105 hover:shadow-2xl">
@@ -235,7 +246,7 @@ export default function Home() {
         <p className="text-xl text-gray-600 text-center mb-12 max-w-3xl mx-auto">
           From country beginnings to poetic masterpieces, explore every chapter of Taylor's musical evolution
         </p>
-        
+
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
           {eras.map((era, index) => (
             <a
@@ -246,7 +257,7 @@ export default function Home() {
               className="group relative h-96 rounded-3xl overflow-hidden shadow-2xl hover:shadow-3xl transition-all duration-700 cursor-pointer transform hover:scale-105 block"
             >
               {/* Background Image with Gradient Overlay */}
-              <div 
+              <div
                 className="absolute inset-0 bg-cover bg-center transition-all duration-500 group-hover:scale-110"
                 style={{
                   backgroundImage: `url('${era.image}')`
@@ -255,20 +266,20 @@ export default function Home() {
                 {/* Darker gradient overlay for better text visibility */}
                 <div className={`absolute inset-0 bg-gradient-to-br ${era.gradient} opacity-70 group-hover:opacity-50 transition-opacity duration-500`}></div>
               </div>
-              
+
               {/* Album Acronym Badge */}
               <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10">
                 <div className={`w-24 h-24 rounded-full bg-black/40 backdrop-blur-sm border border-white/30 flex items-center justify-center text-white font-bold text-2xl shadow-2xl transition-all duration-500 group-hover:scale-110 group-hover:bg-black/50`}>
                   {era.acronym}
                 </div>
               </div>
-              
+
               {/* Bottom Info - Improved contrast */}
               <div className="absolute bottom-6 left-6 right-6 text-white z-10 transition-all duration-500 group-hover:translate-y-2">
                 <h3 className="text-2xl font-bold mb-1 drop-shadow-2xl text-white">{era.name}</h3>
                 <p className="text-white/95 font-medium drop-shadow-xl">{era.year}</p>
               </div>
-              
+
               {/* Hover Overlay */}
               <div className="absolute inset-0 bg-black/70 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-all duration-500 flex items-center justify-center p-6 z-20">
                 <div className="text-center text-white transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
@@ -280,7 +291,7 @@ export default function Home() {
                   <p className="text-white/80 text-sm italic">{era.hoverInfo}</p>
                 </div>
               </div>
-              
+
               {/* 3D Shadow Effect */}
               <div className="absolute inset-0 rounded-3xl shadow-2xl transition-all duration-500 group-hover:shadow-3xl"></div>
             </a>
@@ -296,7 +307,7 @@ export default function Home() {
         <p className="text-xl text-gray-600 text-center mb-12">
           Advanced tools to explore Taylor's lyrical universe
         </p>
-        
+
         <div className="grid md:grid-cols-3 gap-8">
           {features.map((feature, index) => (
             <Link
@@ -308,24 +319,24 @@ export default function Home() {
                 <div className={`absolute top-4 right-4 px-3 py-1 rounded-full text-xs font-semibold bg-gradient-to-r ${feature.color} text-white`}>
                   {feature.era}
                 </div>
-                
+
                 <div className={`w-16 h-16 rounded-2xl bg-gradient-to-r ${feature.color} flex items-center justify-center text-white mb-6 group-hover:scale-110 transition-transform duration-300`}>
                   {feature.icon}
                 </div>
-                
+
                 <h3 className="text-2xl font-bold text-gray-800 mb-3">
                   {feature.title}
                 </h3>
-                
+
                 <p className="text-gray-600 mb-6 leading-relaxed">
                   {feature.description}
                 </p>
-                
+
                 <div className="flex items-center text-purple-600 font-semibold group-hover:gap-3 transition-all duration-300">
-                  Explore Era 
+                  Explore Era
                   <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform duration-300" />
                 </div>
-                
+
                 <div className={`absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r ${feature.color} transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500`}></div>
               </div>
             </Link>
@@ -341,9 +352,9 @@ export default function Home() {
             Ready to Dive Into the Lyrics?
           </h3>
           <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-          
+
           </p>
-          <Link 
+          <Link
             href="/search"
             className="inline-flex items-center gap-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white px-8 py-4 rounded-2xl font-semibold hover:shadow-2xl hover:scale-105 transition-all duration-300 shadow-lg"
           >

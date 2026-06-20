@@ -2,8 +2,9 @@ import type { Metadata } from 'next'
 import { Inter, Playfair_Display } from 'next/font/google'
 import './globals.css'
 import Header from '@/components/Header'
+import ChatAgent from '@/components/ChatAgent'
 
-const inter = Inter({ 
+const inter = Inter({
   subsets: ['latin'],
   variable: '--font-inter'
 })
@@ -47,6 +48,7 @@ export default function RootLayout({
           </div>
           {children}
         </div>
+        <ChatAgent />
       </body>
     </html>
   )
