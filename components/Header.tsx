@@ -2,64 +2,52 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Music, Search, BarChart3, TrendingUp, Sparkles, Home } from 'lucide-react';
+import { useState, useEffect } from 'react';
 
 const navigation = [
-  { name: 'Home', href: '/', icon: Home },
-  { name: 'Keyword Search', href: '/search', icon: Search },
-  { name: 'Sentiment', href: '/sentiment', icon: BarChart3 },
-  { name: 'Trends', href: '/trends', icon: TrendingUp },
+  { name: 'Home', href: '/' },
+  { name: 'Keyword', href: '/search' },
+  { name: 'Insights', href: '/sentiment' },
 ];
 
 export default function Header() {
   const pathname = usePathname();
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 20);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   return (
-    <header className="border-b border-purple-200/30 bg-white/90 backdrop-blur-sm sticky top-0 z-50 shadow-sm">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
-          {/* Logo */}
-          <Link href="/" className="flex items-center space-x-3 group">
-            <div className="relative">
-              <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-bold text-lg group-hover:scale-110 transition-transform duration-300">
-                <Sparkles className="w-5 h-5" />
-              </div>
-              <div className="absolute -inset-1 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full blur opacity-30 group-hover:opacity-70 transition duration-300"></div>
-            </div>
-            <div>
-              <h1 className="font-bold text-2xl bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-                The Swift Journal
-              </h1>
-              <p className="text-xs text-gray-500 -mt-1">Lyrics Analyzer</p>
-            </div>
-          </Link>
+    <nav className={`fixed top-0 w-full z-[100] px-margin-mobile md:px-margin-desktop py-5 transition-all duration-700 bg-surface/80 backdrop-blur-xl border-b border-outline-variant/30 flex justify-between items-center max-w-container-max mx-auto left-0 right-0 ${isScrolled ? 'py-3' : ''}`}>
+      <Link href="/" className="font-headline text-2xl md:text-3xl font-medium text-primary tracking-tight">
+        TS ARCHIVE
+      </Link>
 
-          {/* Navigation */}
-          <nav className="flex space-x-1">
-            {navigation.map((item) => {
-              const Icon = item.icon;
-              const isActive = pathname === item.href;
-              
-              return (
-                <Link
-                  key={item.name}
-                  href={item.href}
-                  className={`relative px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${
-                    isActive
-                      ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg shadow-purple-500/25'
-                      : 'text-gray-600 hover:text-purple-600 hover:bg-purple-50'
-                  }`}
-                >
-                  <div className="flex items-center space-x-2">
-                    <Icon className="w-4 h-4" />
-                    <span>{item.name}</span>
-                  </div>
-                </Link>
-              );
-            })}
-          </nav>
-        </div>
+      <div className="hidden md:flex gap-10 items-center">
+        {navigation.map((item) => (
+          <Link
+            key={item.name}
+            href={item.href}
+            className={`font-body text-[15px] transition-colors ${pathname === item.href
+              ? 'text-primary border-b border-primary pb-1'
+              : 'text-on-surface-variant hover:text-primary'
+              }`}
+          >
+            {item.name}
+          </Link>
+        ))}
       </div>
-    </header>
+
+      <div className="flex items-center gap-4">
+        <button className="material-symbols-outlined text-primary text-2xl hover:bg-parchment/10 transition-all p-2 rounded-full">
+          menu
+        </button>
+      </div>
+    </nav>
   );
 }

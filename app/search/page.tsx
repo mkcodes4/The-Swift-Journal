@@ -1,95 +1,41 @@
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
-import { Search, Music, Sparkles, Filter, X, TrendingUp, Zap, Target, Heart, Star, Plus } from 'lucide-react';
-import SongCard from '@/components/SongCard';
-import Confetti from '@/components/Confetti';
+import { PlayCircle, Star, ChevronRight, Hash, Clock, ArrowLeft } from 'lucide-react';
+import ExhibitModal from '@/components/ExhibitModal';
+import { Song } from '@/lib/utils';
+import { motion, AnimatePresence } from 'framer-motion';
 
-interface Song {
-  title: string;
-  album: string;
-  year: number;
-  lyrics: string;
-  word_count: number;
-  roberta_label: 'positive' | 'negative' | 'neutral';
-  roberta_confidence: number;
-  roberta_compound: number;
-  textblob_polarity: number;
-  textblob_subjectivity: number;
-  [key: string]: any;
-}
+// Fan Favorite heuristics
+const FAN_FAVORITES = [
+  "Blank Space", "All Too Well", "Cruel Summer", "Love Story", "Shake It Off",
+  "Anti-Hero", "Cardigan", "Willow", "August", "Champagne Problems",
+  "Style", "Wildest Dreams", "Enchanted", "Delicate", "Don't Blame Me"
+];
 
-// Enhanced Taylor Swift keywords organized by theme
-const KEYWORD_CATEGORIES = {
-  '💖 Love & Heart': ['love', 'heart', 'baby', 'darling', 'sweet', 'kiss', 'lover', 'romance'],
-  '🌙 Time & Night': ['midnight', 'night', 'dark', 'moon', 'time', 'forever', 'never', 'always', 'memory'],
-  '🎭 Emotions': ['tears', 'smile', 'happy', 'sad', 'cry', 'pain', 'hurt', 'hope', 'dream', 'fear'],
-  '🌈 Colors': ['red', 'blue', 'golden', 'white', 'black', 'paint', 'gray', 'pink', 'purple'],
-  '🌧️ Weather': ['rain', 'storm', 'snow', 'winter', 'summer', 'wind', 'fire', 'lightning'],
-  '📍 Places': ['home', 'city', 'street', 'road', 'new york', 'london', 'paris', 'california'],
-  '👑 Taylor Themes': ['prince', 'princess', 'castle', 'fairytale', 'ghost', 'angel', 'devil', 'story'],
-  '💔 Relationships': ['break', 'leave', 'stay', 'wait', 'promise', 'friend', 'enemy', 'together']
-};
-
-const ALL_KEYWORDS = Object.values(KEYWORD_CATEGORIES).flat();
-
-// Helper function to count word occurrences in lyrics
-const countWordOccurrences = (lyrics: string, word: string): number => {
-  if (!lyrics || !word) return 0;
-  
-  const regex = new RegExp(`\\b${word}\\b`, 'gi');
-  const matches = lyrics.match(regex);
-  return matches ? matches.length : 0;
-};
-
-// Helper function to find related words (basic stemming)
-const findRelatedWords = (word: string): string[] => {
-  const related: string[] = [word];
-  
-  // Basic pluralization
-  if (word.endsWith('s')) {
-    related.push(word.slice(0, -1)); // Remove 's' for singular
-  } else {
-    related.push(word + 's'); // Add 's' for plural
-  }
-  
-  // Common word variations
-  const variations: { [key: string]: string[] } = {
-    'friend': ['friends', 'friendship', 'friendly'],
-    'love': ['loves', 'loved', 'loving', 'lover'],
-    'heart': ['hearts', 'hearted'],
-    'time': ['times', 'timing'],
-    'night': ['nights', 'nighttime'],
-    'day': ['days', 'daytime'],
-    'dream': ['dreams', 'dreaming', 'dreamer'],
-    'cry': ['cries', 'crying', 'cried'],
-    'smile': ['smiles', 'smiling', 'smiled'],
-    'tear': ['tears', 'tearing'],
-    'rain': ['rains', 'raining', 'rainy'],
-    'storm': ['storms', 'stormy'],
-    'snow': ['snows', 'snowing', 'snowy'],
-    'break': ['breaks', 'breaking', 'broken'],
-    'leave': ['leaves', 'leaving', 'left'],
-    'stay': ['stays', 'staying', 'stayed'],
-    'wait': ['waits', 'waiting', 'waited']
-  };
-  
-  if (variations[word]) {
-    related.push(...variations[word]);
-  }
-  
-  return [...new Set(related)]; // Remove duplicates
-};
+// Static Themes (Discovery Bento Grid)
+const THEMES = [
+  { id: 'heartbreak', title: 'Heartbreak', num: '01', sentiment: 'Sentiment', color: 'text-error', bg: 'bg-error-container/10', keywords: ['love', 'heart', 'baby', 'darling', 'kiss', 'lover', 'romance'], img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuADXH2ayopw6pt6KWpmHQ0NleCSqOPLNPY0YykNcfglFBWJOXLtFlcZSyPWjLNpMXlC1S0EHfGdAHEmDT7nXhGMILNcT837ygMR-FtenPzg2aB6rymMYZtUXuNJimP1KACkrHWqQ6xlTK252kd29SLqfq8v5zBHV6SVt2kLIY9ptNj0csnJgCBOkhdRo8SEnhM-9UcImy39JiZq6W7i02LlY7hNFo6aoZ__QhtCrhfPAFA2SePY4kxogXruxhdwMh1SCOnor6n9F9k', desc: 'Fragments of shattered promises and the heavy silence of a room once filled with laughter.' },
+  { id: 'midnights', title: 'Midnights', num: '02', sentiment: 'Hour', color: 'text-tertiary', bg: 'bg-tertiary-container/20', keywords: ['midnight', 'night', 'dark', 'moon', 'time'], img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuD7u6xCEgJn7SpQwgUpcFO-sNg35QO2aNZLId-Wn9gCB_saepN_E73IbvDuazeX0KWuharzC1eAznLVtZiAwxenOfhv1LLZv80zwlKwtcjxUmLBsfYlJDIEcNneGDsY992AzEt-lUARb9JaH7dsiVvyH3I0ktJ5xWTTiFocErPbipnIav9_PVziUdyIXh9322-iFchX72GfrOqz9gDTKO6XXR0cPCRWy5UZ_zC6oQYQ1RZY3ip9-cD3KQ_j2V8ksLhwAjs6mCKx8PE', desc: 'The stories we tell ourselves when the world is fast asleep.' },
+  { id: 'dreams', title: 'Dreams', num: '03', sentiment: 'Vision', color: 'text-secondary', bg: 'bg-secondary-container/10', keywords: ['dream', 'fantasy', 'wonder', 'magic', 'impossible'], img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDgUGkKKnrbJ94o869UPQXyaQFlnocYDjjN8HWp_ZzkV_azbdBZD6ljvSM9zsCoP4NrEtjPU2Cpqq7CoLrVtTlAZM6Uf5dxKR4z5U2PLzFTaP2kdajWLZNI3XLEDRVZKmn3RGgbvmTOx7WYmgiQXKm0DR78FJVadVVqvI-WBq_qQ-vhIl4yQUNA4_rg21Uldihrg_ZHFtBgfwe5IDPqrN-vFguOLbP-cqKaNWV4BsQg0xPUPTLnnjvV0auMTpFLmt5VCCeL3RNx4wE', desc: 'Where reality fades and the impossible begins to breathe.' },
+  { id: 'time', title: 'Time', num: '04', sentiment: 'Continuum', color: 'text-primary', bg: 'bg-primary-container/20', keywords: ['forever', 'never', 'always', 'memory', 'time', 'past'], img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBNwtWq9eIilWzNPkTc4BwydC6YpNc2hneAaul4ZNW73ZxiCk1-dSkOxH8JdDCQsvWam6hSYcFQsVuKtnb9Aye_rdf-9BtXbjy3yrZqHx67HZDkprECjGcNGb8OY18JWbpRmBmfcd_PuvwkELgDenLrUoiDmakMEsiWNFPyiP-00bTfjvEy9AQIxmsGVT7fxk3J_NP65BGN781MuvJFMpI57QzGpoVpqdXqoXeyrkdgC10-8zc5seRAqHQ638TNuMnc4BcZ17DvBKQ', desc: 'The relentless river that carries our memories from the past into the forever.' }
+];
 
 export default function SearchPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedKeywords, setSelectedKeywords] = useState<string[]>([]);
   const [songs, setSongs] = useState<Song[]>([]);
   const [loading, setLoading] = useState(true);
-  const [showConfetti, setShowConfetti] = useState(false);
-  const [hoveredKeyword, setHoveredKeyword] = useState('');
+  const [selectedSong, setSelectedSong] = useState<Song | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [expandedAlbum, setExpandedAlbum] = useState<string | null>(null);
 
-  // Load songs data
+  const [isVaultSearch, setIsVaultSearch] = useState(false);
+  const [vaultResults, setVaultResults] = useState<{ title: string, score: number }[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const [isBlocked, setIsBlocked] = useState(false);
+  const [blockMessage, setBlockMessage] = useState('');
+
   useEffect(() => {
     const loadSongs = async () => {
       try {
@@ -105,290 +51,446 @@ export default function SearchPage() {
     loadSongs();
   }, []);
 
+  useEffect(() => {
+    if (!isVaultSearch || !searchTerm.trim()) {
+      setVaultResults([]);
+      setIsBlocked(false);
+      return;
+    }
+    const timer = setTimeout(async () => {
+      setIsSearching(true);
+      try {
+        const response = await fetch('/api/vault-search', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ query: searchTerm })
+        });
+        const data = await response.json();
+        if (data.status === 'success') {
+          setVaultResults(data.matches);
+          setIsBlocked(false);
+        } else if (data.status === 'blocked') {
+          setVaultResults([]);
+          setIsBlocked(true);
+          setBlockMessage(data.message);
+        }
+      } catch (error) {
+        console.error('Vault search error:', error);
+      } finally {
+        setIsSearching(false);
+      }
+    }, 600);
+    return () => clearTimeout(timer);
+  }, [searchTerm, isVaultSearch]);
+
+  // Reset expanded album when search term changes to show global results
+  useEffect(() => {
+    if (searchTerm) setExpandedAlbum(null);
+  }, [searchTerm]);
+
   const filteredSongs = useMemo(() => {
-    if (!searchTerm && selectedKeywords.length === 0) return songs;
-    
+    let baseResults = songs;
+
+    // 1. Handle Vault Search results first if active
+    if (isVaultSearch && vaultResults.length > 0) {
+      const matchTitles = vaultResults.map(r => r.title.toLowerCase());
+      baseResults = songs.filter(s => matchTitles.includes(s.title.toLowerCase()));
+      // Sort by semantic score
+      return [...baseResults].sort((a, b) => {
+        const scoreA = vaultResults.find(r => r.title.toLowerCase() === a.title.toLowerCase())?.score || 0;
+        const scoreB = vaultResults.find(r => r.title.toLowerCase() === b.title.toLowerCase())?.score || 0;
+        return scoreB - scoreA;
+      });
+    }
+
+    // 2. Fallback to Classic Search (Keyword matching)
+    if (!searchTerm && selectedKeywords.length === 0) return baseResults;
+
     const term = searchTerm.toLowerCase().trim();
-    
-    return songs.filter(song => {
-      const inLyrics = term ? song.lyrics.toLowerCase().includes(term) : false;
-      const inTitle = term ? song.title.toLowerCase().includes(term) : false;
-      
-      // Check if song contains ALL selected keywords (using keyword counts from model OR lyrics search)
-      const hasAllKeywords = selectedKeywords.length > 0 
+    // Use word-boundary regex to avoid matching partial words (e.g., "red" in "remembered")
+    const wordRegex = term ? new RegExp(`\\b${term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i') : null;
+
+    return baseResults.filter(song => {
+      const inLyrics = wordRegex ? wordRegex.test(song.lyrics) : false;
+      const inTitle = wordRegex ? wordRegex.test(song.title) : false;
+      const inAlbum = wordRegex ? wordRegex.test(song.album) : false;
+
+      const hasAllKeywords = selectedKeywords.length > 0
         ? selectedKeywords.every(keyword => {
-            // First check if the keyword exists in the model data
-            if (song[keyword] > 0) return true;
-            
-            // If not in model data, search in lyrics
-            return countWordOccurrences(song.lyrics.toLowerCase(), keyword) > 0;
-          })
+          if (song[keyword] > 0) return true;
+          return song.lyrics.toLowerCase().includes(keyword.toLowerCase());
+        })
         : true;
-      
-      return (inLyrics || inTitle || selectedKeywords.length > 0) && hasAllKeywords;
+
+      return (inLyrics || inTitle || inAlbum) && hasAllKeywords;
     });
-  }, [searchTerm, selectedKeywords, songs]);
+  }, [searchTerm, selectedKeywords, songs, isVaultSearch, vaultResults]);
 
-  // Enhanced keyword suggestions that include related words
-  const enhancedPopularKeywords = useMemo(() => {
-    const baseKeywords = ALL_KEYWORDS.slice(0, 12);
-    const enhanced: string[] = [];
-    
-    baseKeywords.forEach(keyword => {
-      enhanced.push(keyword);
-      // Add a few related words for better discovery
-      const related = findRelatedWords(keyword).slice(0, 2); // Limit to 2 related words
-      enhanced.push(...related);
+  // Group by Album logic
+  const albumGroups = useMemo(() => {
+    const groups: { [key: string]: { songs: Song[], year: number } } = {};
+    filteredSongs.forEach(song => {
+      if (!groups[song.album]) {
+        groups[song.album] = { songs: [], year: song.year };
+      }
+      groups[song.album].songs.push(song);
     });
-    
-    return [...new Set(enhanced)].slice(0, 20); // Remove duplicates and limit
-  }, []);
+    return Object.entries(groups).sort((a, b) => b[1].year - a[1].year);
+  }, [filteredSongs]);
 
-  const handleKeywordSelect = (keyword: string) => {
-    if (selectedKeywords.includes(keyword)) {
-      // Remove if already selected
-      setSelectedKeywords(selectedKeywords.filter(k => k !== keyword));
-    } else {
-      // Add to selected keywords
-      setSelectedKeywords([...selectedKeywords, keyword]);
-    }
-    
-    if (keyword === 'love' || keyword === 'happy') {
-      setShowConfetti(true);
-      setTimeout(() => setShowConfetti(false), 3000);
-    }
-  };
-
-  const handleSearchAdd = () => {
-    if (searchTerm.trim() && !selectedKeywords.includes(searchTerm.trim().toLowerCase())) {
-      setSelectedKeywords([...selectedKeywords, searchTerm.trim().toLowerCase()]);
-      setSearchTerm('');
-    }
-  };
-
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      handleSearchAdd();
-    }
-  };
-
-  const removeKeyword = (keywordToRemove: string) => {
-    setSelectedKeywords(selectedKeywords.filter(k => k !== keywordToRemove));
-  };
-
-  const clearAllKeywords = () => {
-    setSelectedKeywords([]);
-  };
-
-  // Calculate total occurrences for display
-  const getTotalOccurrences = (song: Song, keywords: string[]): number => {
-    return keywords.reduce((total, keyword) => {
-      // Use model data if available, otherwise count in lyrics
-      const modelCount = song[keyword] || 0;
-      const lyricsCount = countWordOccurrences(song.lyrics.toLowerCase(), keyword);
-      return total + Math.max(modelCount, lyricsCount);
-    }, 0);
+  const handleThemeClick = (keywords: string[]) => {
+    setSelectedKeywords(keywords);
+    setExpandedAlbum(null);
+    const exhibits = document.getElementById('exhibits-section');
+    if (exhibits) exhibits.scrollIntoView({ behavior: 'smooth' });
   };
 
   if (loading) {
-    return (
-      <div className="min-h-screen py-8 px-4 bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50">
-        <div className="max-w-6xl mx-auto">
-          <div className="animate-pulse">
-            <div className="h-8 bg-gradient-to-r from-purple-200 to-pink-200 rounded-full w-1/3 mx-auto mb-4"></div>
-            <div className="h-4 bg-gradient-to-r from-gray-200 to-gray-300 rounded-full w-1/2 mx-auto mb-12"></div>
-            <div className="h-12 bg-gradient-to-r from-purple-100 to-pink-100 rounded-2xl mb-8 shadow-inner"></div>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {[...Array(6)].map((_, i) => (
-                <div key={i} className="h-48 bg-gradient-to-br from-purple-100 to-pink-100 rounded-2xl shadow-inner animate-pulse"></div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-    );
+    return <div className="min-h-screen flex items-center justify-center font-headline text-2xl italic animate-pulse">Opening the Vault...</div>;
   }
 
   return (
-    <div className="min-h-screen py-8 px-4 bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50">
-      {showConfetti && <Confetti />}
-      
-      {/* Floating decorative elements */}
-      <div className="fixed top-20 left-10 w-4 h-4 bg-pink-300 rounded-full opacity-60 animate-bounce"></div>
-      <div className="fixed top-40 right-20 w-6 h-6 bg-purple-300 rounded-full opacity-40 animate-pulse"></div>
-      <div className="fixed bottom-32 left-20 w-3 h-3 bg-blue-300 rounded-full opacity-70 animate-bounce delay-300"></div>
-      
-      <div className="max-w-6xl mx-auto relative">
-        {/* Header with sparkle effect */}
-        <div className="text-center mb-12 relative">
-          <div className="absolute -top-4 -left-4 animate-spin-slow">
-            <Sparkles className="w-8 h-8 text-yellow-400" />
-          </div>
-          <h1 className="text-5xl font-bold bg-gradient-to-r from-purple-600 via-pink-500 to-purple-600 bg-clip-text text-transparent mb-4 animate-gradient bg-300%">
-            Keyword Explorer
+    <div className="bg-background min-h-screen">
+      <main className="pt-32 pb-24">
+        {/* Hero & Search Sections (Omitted for brevity, kept exactly same as previous) */}
+        <section className="max-w-container-max mx-auto px-margin-desktop text-center mb-20">
+          <h1 className="font-headline text-6xl md:text-[64px] text-on-surface mb-6 uppercase tracking-[0.2em] opacity-90 leading-tight">
+            THE LYRIC VAULT
           </h1>
-          <p className="text-xl text-gray-600 font-medium">
-            Discover patterns and themes across <span className="font-bold text-purple-500">{songs.length}</span> Taylor Swift songs
+          <p className="font-headline text-2xl text-on-surface-variant italic max-w-3xl mx-auto leading-relaxed">
+            Explore {songs.length} songs and 14 eras of lyrical history.
           </p>
-          <div className="absolute -top-4 -right-4 animate-ping">
-            <Star className="w-6 h-6 text-purple-400" />
-          </div>
-        </div>
+        </section>
 
-        {/* Search Bar with enhanced styling - Now with Add button */}
-        <div className="max-w-2xl mx-auto mb-8 transform hover:scale-[1.02] transition-transform duration-300">
-          <div className="relative">
-            <div className="absolute inset-0 bg-gradient-to-r from-purple-400 to-pink-400 rounded-2xl blur opacity-30"></div>
-            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-purple-500 w-6 h-6 z-10" />
-            <input
-              type="text"
-              placeholder="✨ Search for any word in lyrics (friends, love, heart, etc.)..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              onKeyPress={handleKeyPress}
-              className="relative w-full pl-12 pr-16 py-4 text-lg border-2 border-purple-200 rounded-2xl focus:ring-2 focus:ring-purple-500 focus:border-transparent shadow-lg bg-white/80 backdrop-blur-sm transition-all duration-300"
-            />
-            <button
-              onClick={handleSearchAdd}
-              disabled={!searchTerm.trim()}
-              className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-gradient-to-r from-purple-500 to-pink-500 text-white p-2 rounded-full hover:scale-110 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <Plus className="w-4 h-4" />
+        <section className="max-w-3xl mx-auto px-margin-mobile mb-32">
+          <div className="relative group">
+            <div className="absolute inset-0 bg-secondary-container/20 blur-2xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
+            <div className="relative bg-surface/60 backdrop-blur-md border border-outline-variant/50 p-2 rounded-full flex items-center gap-2 shadow-sm">
+              <div className="flex bg-surface-container rounded-full p-1 gap-1">
+                <button
+                  onClick={() => setIsVaultSearch(false)}
+                  className={`px-6 py-2 rounded-full font-body text-xs font-bold uppercase tracking-widest transition-all duration-300 ${!isVaultSearch
+                    ? 'bg-on-surface text-surface shadow-md scale-105'
+                    : 'text-on-surface-variant/50 hover:text-on-surface-variant'
+                    }`}
+                >
+                  Classic Search
+                </button>
+                <button
+                  onClick={() => setIsVaultSearch(true)}
+                  className={`px-6 py-2 rounded-full font-body text-xs font-bold uppercase tracking-widest flex items-center gap-2 transition-all duration-300 ${isVaultSearch
+                    ? 'bg-primary text-on-primary shadow-md scale-105'
+                    : 'text-on-surface-variant/50 hover:text-on-surface-variant'
+                    }`}
+                >
+                  Vault Search
+                  <span className="material-symbols-outlined text-[14px]">auto_awesome</span>
+                </button>
+              </div>
+              <input
+                type="text"
+                placeholder={isVaultSearch ? "Search by theme (e.g. 'growing up')..." : "Search for a song, album, or lyric..."}
+                value={searchTerm}
+                onChange={(e) => {
+                  setSearchTerm(e.target.value);
+                  if (e.target.value && selectedKeywords.length > 0) {
+                    setSelectedKeywords([]);
+                  }
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    const el = document.getElementById('exhibits-section');
+                    if (el) el.scrollIntoView({ behavior: 'smooth' });
+                  }
+                }}
+                className="flex-grow bg-transparent border-none focus:ring-0 font-body text-on-surface px-4 py-2 placeholder:text-outline italic"
+              />
+              <div
+                className="bg-primary text-on-primary w-12 h-12 rounded-full flex items-center justify-center hover:bg-primary/90 transition-all cursor-pointer"
+                onClick={() => {
+                  const el = document.getElementById('exhibits-section');
+                  if (el) el.scrollIntoView({ behavior: 'smooth' });
+                }}
+              >
+                {isSearching ? <div className="w-4 h-4 border-2 border-on-primary border-t-transparent rounded-full animate-spin"></div> : <span className="material-symbols-outlined">search</span>}
+              </div>
+            </div>
+          </div>
+          {searchTerm && !isBlocked && (
+            <div className="mt-4 text-center">
+              <span className="font-body text-xs text-on-surface-variant">
+                Found <span className="font-bold text-primary">{filteredSongs.length}</span> artifacts across <span className="font-bold text-primary">{albumGroups.length}</span> collections — <button onClick={() => { const el = document.getElementById('exhibits-section'); if (el) el.scrollIntoView({ behavior: 'smooth' }); }} className="underline text-primary hover:opacity-70 transition-opacity">View Results ↓</button>
+              </span>
+            </div>
+          )}
+
+          {/* Vault Search — Dedicated Ranked Results Panel */}
+          <AnimatePresence>
+            {isVaultSearch && isBlocked && (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                className="mt-8 bg-error-container/30 backdrop-blur-sm border border-error/20 rounded-lg p-6 text-center"
+              >
+                <div className="flex items-center justify-center gap-2 text-error mb-2">
+                  <span className="material-symbols-outlined">warning</span>
+                  <span className="font-body text-xs font-bold uppercase tracking-widest">Safety Notice</span>
+                </div>
+                <p className="font-body text-sm text-on-error-container">{blockMessage}</p>
+              </motion.div>
+            )}
+
+            {isVaultSearch && vaultResults.length > 0 && !isBlocked && (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                className="mt-8 bg-white/70 backdrop-blur-sm border border-outline-variant/30 rounded-lg shadow-lg overflow-hidden"
+              >
+                <div className="px-8 py-5 border-b border-outline-variant/20 flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <span className="material-symbols-outlined text-primary text-lg">auto_awesome</span>
+                    <span className="font-body text-xs font-bold uppercase tracking-[0.3em] text-on-surface">AI Vault Results</span>
+                    <span className="bg-primary/10 text-primary text-[10px] font-bold px-2 py-0.5 rounded-full">{vaultResults.length} matches</span>
+                  </div>
+                  <span className="font-body text-[10px] text-outline italic">Ranked by semantic relevance</span>
+                </div>
+                <div className="divide-y divide-outline-variant/10">
+                  {vaultResults.map((result, idx) => {
+                    const song = songs.find(s => s.title.toLowerCase() === result.title.toLowerCase());
+                    const confidencePct = Math.round(result.score * 100);
+                    return (
+                      <div key={result.title} className="flex items-center gap-6 px-8 py-4 hover:bg-surface-container-low/50 transition-colors group">
+                        <span className="font-body text-xs font-bold text-outline/30 tabular-nums w-6">{idx + 1}</span>
+                        <div className="flex-grow">
+                          <div className="flex items-center gap-3 mb-1">
+                            <h4 className="font-headline text-lg italic group-hover:text-primary transition-colors">{result.title}</h4>
+                            {FAN_FAVORITES.includes(result.title) && (
+                              <span className="flex items-center gap-1 bg-yellow-500/10 text-yellow-600 text-[8px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full border border-yellow-500/20">
+                                <Star className="w-2 h-2 fill-yellow-500" /> Fan Favorite
+                              </span>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-3">
+                            <span className="font-body text-[10px] text-outline uppercase tracking-widest">{song?.album ?? '—'} · {song?.year ?? ''}</span>
+                            <div className="flex-grow h-[2px] bg-outline-variant/20 rounded-full max-w-[120px]">
+                              <div className="h-full bg-primary rounded-full transition-all" style={{ width: `${confidencePct}%` }}></div>
+                            </div>
+                            <span className="font-body text-[10px] text-primary font-bold tabular-nums">{confidencePct}%</span>
+                          </div>
+                        </div>
+                        {song && (
+                          <button
+                            onClick={() => { setSelectedSong(song); setIsModalOpen(true); }}
+                            className="font-body text-[9px] font-bold uppercase tracking-widest border border-outline-variant/50 px-4 py-2 hover:border-primary hover:text-primary transition-all opacity-0 group-hover:opacity-100 shrink-0"
+                          >
+                            Analyse
+                          </button>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </section>
+
+        {/* Discovery Themes (Bento Grid) */}
+        <section className="max-w-container-max mx-auto px-margin-desktop mb-40">
+          <div className="flex justify-between items-end mb-12 border-b border-outline-variant/20 pb-6">
+            <div>
+              <span className="font-body text-xs font-bold uppercase tracking-[0.3em] text-outline">Discovery</span>
+              <h2 className="font-headline text-3xl mt-2">Curated Themes</h2>
+            </div>
+            <button className="font-body text-sm italic hover:text-primary transition-colors flex items-center gap-2">
+              View All Archives <span className="material-symbols-outlined text-sm">arrow_forward</span>
             </button>
           </div>
-          <p className="text-sm text-gray-500 mt-2 text-center">
-            Search for any word in lyrics • Press Enter or click + to add as keyword
-          </p>
-        </div>
-
-        {/* Selected Keywords Display */}
-        {selectedKeywords.length > 0 && (
-          <div className="max-w-4xl mx-auto mb-6 animate-fade-in">
-            <div className="flex items-center gap-3 justify-center flex-wrap">
-              <Target className="w-5 h-5 text-purple-600 animate-pulse" />
-              <span className="text-sm text-gray-600 font-medium">Active keywords:</span>
-              {selectedKeywords.map((keyword, index) => (
-                <div 
-                  key={keyword} 
-                  className="flex items-center gap-2 bg-gradient-to-r from-purple-100 to-pink-100 text-purple-700 px-4 py-2 rounded-full text-sm font-medium border border-purple-200 shadow-lg transform hover:scale-105 transition-transform animate-fade-in"
-                  style={{ animationDelay: `${index * 100}ms` }}
-                >
-                  <Sparkles className="w-4 h-4" />
-                  {keyword}
-                  <button 
-                    onClick={() => removeKeyword(keyword)} 
-                    className="ml-1 hover:text-purple-900 transition-colors"
-                  >
-                    <X className="w-4 h-4" />
-                  </button>
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-8 h-auto">
+            {THEMES.map((theme, idx) => (
+              <div
+                key={theme.id}
+                onClick={() => handleThemeClick(theme.keywords)}
+                className={`${idx % 3 === 0 ? 'md:col-span-8' : 'md:col-span-4'} group relative overflow-hidden ${theme.bg} border border-outline-variant/30 rounded-lg aspect-[16/9] md:aspect-auto cursor-pointer h-full`}
+              >
+                <div
+                  className="absolute inset-0 transition-transform duration-700 group-hover:scale-105 bg-cover bg-center opacity-40"
+                  style={{ backgroundImage: `url('${theme.img}')` }}
+                ></div>
+                <div className="absolute inset-0 bg-gradient-to-t from-background/90 to-transparent"></div>
+                <div className="absolute bottom-0 left-0 p-8 md:p-10">
+                  <span className={`font-body text-xs font-bold ${theme.color} uppercase tracking-widest mb-2 block`}>{theme.num} — {theme.sentiment}</span>
+                  <h3 className="font-headline text-4xl mb-4">{theme.title}</h3>
+                  <p className="font-body text-sm text-on-surface-variant max-w-md opacity-0 group-hover:opacity-100 transition-all duration-500 translate-y-4 group-hover:translate-y-0">
+                    {theme.desc}
+                  </p>
                 </div>
-              ))}
-              <button
-                onClick={clearAllKeywords}
-                className="text-sm text-gray-500 hover:text-red-500 transition-colors font-medium"
-              >
-                Clear all
-              </button>
-            </div>
-            <p className="text-xs text-gray-400 text-center mt-2">
-              Showing songs that contain ALL selected keywords (searches entire lyrics)
-            </p>
-          </div>
-        )}
-
-        {/* Popular Keywords with enhanced styling */}
-        <div className="max-w-4xl mx-auto mb-8">
-          <div className="flex items-center gap-2 mb-4 justify-center">
-            <Zap className="w-6 h-6 text-yellow-500 animate-bounce" />
-            <h3 className="text-lg font-semibold text-gray-700 bg-white/50 px-4 py-1 rounded-full">Popular Keywords</h3>
-          </div>
-          <div className="flex flex-wrap gap-3 justify-center">
-            {enhancedPopularKeywords.map(keyword => (
-              <button
-                key={keyword}
-                onClick={() => handleKeywordSelect(keyword)}
-                onMouseEnter={() => setHoveredKeyword(keyword)}
-                onMouseLeave={() => setHoveredKeyword('')}
-                className={`px-4 py-3 rounded-2xl border-2 transition-all duration-300 font-medium shadow-lg transform hover:scale-110 ${
-                  selectedKeywords.includes(keyword)
-                    ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white border-transparent shadow-xl scale-105'
-                    : 'bg-gradient-to-br from-white to-gray-50 text-gray-700 border-purple-100 hover:border-purple-300 hover:shadow-xl'
-                } ${hoveredKeyword === keyword ? 'ring-2 ring-purple-300' : ''}`}
-              >
-                {keyword === 'love' && <Heart className="w-4 h-4 inline mr-1 text-red-400" />}
-                {selectedKeywords.includes(keyword) && <Star className="w-4 h-4 inline mr-1 text-yellow-300" />}
-                {keyword}
-              </button>
+              </div>
             ))}
           </div>
-          <p className="text-xs text-gray-500 text-center mt-3">
-            Includes common words and their variations (friend → friends, love → loves, etc.)
-          </p>
-        </div>
+        </section>
 
-        {/* Results Summary with animation */}
-        <div className="max-w-4xl mx-auto mb-6 text-center animate-fade-in">
-          <p className="text-lg text-gray-700 font-medium">
-            Found <span className="font-bold text-2xl bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent animate-pulse">
-              {filteredSongs.length}
-            </span> songs
-            {selectedKeywords.length > 0 && ` containing ${selectedKeywords.length} keyword${selectedKeywords.length > 1 ? 's' : ''}`}
-            {searchTerm && !selectedKeywords.includes(searchTerm.toLowerCase()) && ` with "${searchTerm}"`}
-          </p>
-          {selectedKeywords.length > 0 && (
-            <p className="text-sm text-gray-500 mt-1">
-              Keywords: {selectedKeywords.join(', ')}
-            </p>
-          )}
-        </div>
-
-        {/* Results Grid with staggered animation */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredSongs.map((song, index) => (
-            <div 
-              key={index}
-              className="animate-fade-in-up"
-              style={{ animationDelay: `${index * 100}ms` }}
-            >
-              <SongCard
-                song={song}
-                keyword={selectedKeywords.join(', ')}
-                count={getTotalOccurrences(song, selectedKeywords)}
-              />
+        {/* Exhibits Section: ALbum Centric */}
+        <section id="exhibits-section" className="bg-surface-container-low py-32 overflow-hidden min-h-[600px]">
+          <div className="max-w-container-max mx-auto px-margin-desktop">
+            <div className="text-center mb-24">
+              <h2 className="font-headline text-5xl md:text-6xl mb-4 italic">The Exhibits</h2>
+              <p className="font-body text-lg text-on-surface-variant max-w-2xl mx-auto">
+                Discover songs organized by their era and album entry.
+              </p>
             </div>
-          ))}
-        </div>
 
-        {filteredSongs.length === 0 && !loading && (
-          <div className="text-center py-16 animate-bounce-in">
-            <div className="relative inline-block">
-              <Music className="w-20 h-20 text-gray-400 mx-auto mb-4 animate-float" />
-              <div className="absolute inset-0 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full blur opacity-20 animate-pulse"></div>
-            </div>
-            <p className="text-gray-500 text-xl font-medium mb-2">No songs found matching your search.</p>
-            <p className="text-gray-400 font-medium">
-              Try searching for common words like "love", "heart", "time", "night", etc. ✨
-            </p>
+            <AnimatePresence mode="wait">
+              {albumGroups.length === 0 ? (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="text-center py-20"
+                >
+                  <p className="font-headline text-2xl italic text-outline mb-4">No artifacts found in the Vault matching your query.</p>
+                  <button
+                    onClick={() => { setSearchTerm(''); setSelectedKeywords([]); }}
+                    className="font-body text-xs font-bold uppercase tracking-widest border-b border-primary text-primary"
+                  >
+                    Reset Archive Search
+                  </button>
+                </motion.div>
+              ) : !expandedAlbum ? (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10"
+                >
+                  {albumGroups.map(([albumName, data]) => (
+                    <div
+                      key={albumName}
+                      onClick={() => setExpandedAlbum(albumName)}
+                      className="group relative cursor-pointer"
+                    >
+                      <div className="deckled-edge bg-white p-10 shadow-sm border border-outline-variant/30 transition-all group-hover:rotate-[-1.5deg] group-hover:shadow-2xl h-[300px] flex flex-col justify-center items-center text-center relative overflow-hidden">
+                        <div className="absolute inset-0 opacity-[0.03] flex items-center justify-center select-none pointer-events-none">
+                          <span className="font-headline text-[180px] tracking-tighter uppercase">{albumName.charAt(0)}</span>
+                        </div>
+                        <div className="relative z-10 w-full">
+                          <span className="font-body text-[10px] font-bold text-outline tracking-[0.4em] uppercase mb-6 block">Collection Era</span>
+                          <h3 className="font-headline text-4xl italic leading-tight mb-2">{albumName}</h3>
+                          <div className="h-[1px] w-12 bg-primary/20 mx-auto mt-6"></div>
+                        </div>
+
+                        <div className="absolute bottom-8 left-0 right-0 px-10 flex justify-between items-center">
+                          <span className="font-body text-[10px] font-bold text-outline tracking-widest uppercase">{data.year}</span>
+                          <div className="flex flex-col items-end gap-2">
+                            {data.songs.some(s => FAN_FAVORITES.includes(s.title)) && (
+                              <span className="flex items-center gap-1 bg-yellow-500/10 text-yellow-600 text-[8px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-sm border border-yellow-500/20">
+                                <Star className="w-2 h-2 fill-yellow-500" /> Top Tier
+                              </span>
+                            )}
+                            <span className="font-body text-[10px] font-bold text-primary flex items-center gap-2 uppercase tracking-widest group-hover:translate-x-1 transition-transform">
+                              {data.songs.length} Entries <ChevronRight className="w-3 h-3" />
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </motion.div>
+              ) : (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.98 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.98 }}
+                  className="bg-white/80 p-12 md:p-20 shadow-2xl border border-outline-variant/20 rounded-sm paper-grain relative"
+                >
+                  <button
+                    onClick={() => setExpandedAlbum(null)}
+                    className="absolute top-10 left-10 flex items-center gap-2 font-body text-xs font-bold uppercase tracking-widest text-outline hover:text-primary transition-colors"
+                  >
+                    <ArrowLeft className="w-4 h-4" /> Back to Archives
+                  </button>
+
+                  <div className="text-center mb-20 pt-10">
+                    <span className="font-body text-xs font-bold text-primary uppercase tracking-[0.5em] mb-4 block">Archive Collection</span>
+                    <h3 className="font-headline text-6xl italic mb-6">{expandedAlbum}</h3>
+                    <div className="h-[1px] w-32 bg-outline-variant/50 mx-auto"></div>
+                  </div>
+
+                  <div className="max-w-4xl mx-auto divide-y divide-outline-variant/20">
+                    {albumGroups.find(([name]) => name === expandedAlbum)?.[1].songs.map((song, idx) => (
+                      <div
+                        key={song.title}
+                        className="group flex flex-col md:flex-row justify-between items-center py-8 hover:bg-surface-container-low transition-colors px-6 -mx-6"
+                      >
+                        <div className="flex items-center gap-8 mb-6 md:mb-0">
+                          <span className="font-body text-xs font-bold text-outline/30 tabular-nums">{(idx + 1).toString().padStart(2, '0')}</span>
+                          <div>
+                            <div className="flex items-center gap-3">
+                              <h4 className="font-headline text-2xl italic group-hover:text-primary transition-colors">{song.title}</h4>
+                              {FAN_FAVORITES.includes(song.title) && (
+                                <span className="flex items-center gap-1 bg-yellow-500/10 text-yellow-600 text-[10px] font-bold uppercase tracking-[0.2em] px-3 py-1 rounded-full border border-yellow-500/30 shadow-sm animate-pulse">
+                                  <Star className="w-3 h-3 fill-yellow-500" /> Fan Favorite
+                                </span>
+                              )}
+                            </div>
+                            <p className="font-body text-xs text-outline tabular-nums mt-1 uppercase tracking-widest">
+                              Sentiment: {song.roberta_compound > 0 ? '+' : ''}{song.roberta_compound.toFixed(2)} — {song.word_count} Words
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-6">
+                          <PlayCircle className="w-6 h-6 text-outline/20 group-hover:text-primary transition-colors cursor-pointer" />
+                          <button
+                            onClick={() => {
+                              setSelectedSong(song);
+                              setIsModalOpen(true);
+                            }}
+                            className="font-body text-[10px] font-bold uppercase tracking-widest border border-primary px-8 py-3 hover:bg-primary hover:text-on-primary transition-all active:scale-95"
+                          >
+                            Audit Lyrical DNA
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
-        )}
+        </section>
+      </main>
 
-        {/* Bingo Mode Hint with enhanced styling */}
-        {filteredSongs.length > 5 && (
-          <div className="max-w-2xl mx-auto mt-12 p-8 bg-gradient-to-r from-purple-100 via-pink-100 to-purple-100 rounded-3xl border-2 border-purple-200 text-center shadow-xl transform hover:scale-[1.02] transition-transform duration-300 animate-pulse-slow">
-            <div className="relative">
-              <Sparkles className="w-10 h-10 text-purple-600 mx-auto mb-4 animate-spin-slow" />
-              <div className="absolute inset-0 bg-yellow-200 rounded-full blur-lg opacity-30 animate-ping"></div>
-            </div>
-            <h3 className="text-2xl font-bold text-gray-800 mb-3 bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-              Advanced Search Active!
-            </h3>
-            <p className="text-gray-600 text-lg font-medium">
-              Your search is scanning all lyrics for matches. 
-              Try adding more keywords to narrow down results! 🎯
+      <footer className="w-full py-16 px-margin-desktop bg-surface-container-lowest border-t border-outline-variant/20">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-end max-w-container-max mx-auto">
+          <div>
+            <div className="font-headline text-3xl italic text-primary mb-4">The Archive</div>
+            <p className="font-body text-sm text-on-surface-variant max-w-sm mb-6">
+              A digital sanctum for lyrical preservation and intellectual study.
             </p>
+            <div className="flex gap-6 text-[10px] font-bold uppercase tracking-widest text-outline">
+              <a className="hover:text-primary transition-colors" href="#">Guidelines</a>
+              <a className="hover:text-primary transition-colors" href="#">Copyright</a>
+              <a className="hover:text-primary transition-colors" href="#">Privacy</a>
+            </div>
           </div>
-        )}
-      </div>
+          <div className="text-right">
+            <div className="font-body text-[10px] font-bold text-outline uppercase tracking-widest mb-4">© 2024 Lyrical Archive. Curated with reverence.</div>
+            <div className="flex justify-end gap-3">
+              <div className="w-8 h-8 border border-outline-variant/50 rounded-full flex items-center justify-center hover:bg-primary hover:text-on-primary transition-all cursor-pointer">
+                <span className="material-symbols-outlined text-xs">public</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </footer>
+
+      <ExhibitModal
+        song={selectedSong}
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        keyword={searchTerm}
+      />
     </div>
   );
 }

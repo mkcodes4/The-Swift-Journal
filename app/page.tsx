@@ -1,369 +1,306 @@
 import Link from 'next/link';
-import { ArrowRight, Music, BarChart3, Search, TrendingUp, Sparkles, Heart, Star } from 'lucide-react';
+import { ArrowRight, Search, BarChart3, TrendingUp, Sparkles, ChevronDown } from 'lucide-react';
+import BackgroundShader from '@/components/BackgroundShader';
 
 export default function Home() {
   const eras = [
     {
+      id: '01',
       name: 'Taylor Swift',
-      acronym: 'TS',
       year: '2006',
-      description: 'Country beginnings and teenage dreams',
-      colors: 'from-blue-200 to-pink-200',
-      gradient: 'from-sky-200/80 to-pink-200/80',
-      hoverInfo: 'Most Positive Song: Our Song',
+      acronym: 'TS',
+      tagline: 'The Country Genesis',
+      badgeColor: 'bg-[#d3e7de] text-[#43554e]',
+      cardBg: 'bg-white',
       image: 'https://upload.wikimedia.org/wikipedia/en/1/1f/Taylor_Swift_-_Taylor_Swift.png',
       spotifyUrl: 'https://open.spotify.com/album/7mzrIsaAjnXihW3InKjlC3'
     },
     {
+      id: '02',
       name: 'Fearless',
-      acronym: 'F',
       year: '2008',
-      description: 'Golden age of country pop',
-      colors: 'from-yellow-200 to-orange-200',
-      gradient: 'from-yellow-200/80 to-orange-200/80',
-      hoverInfo: 'Most Streamed Track: Love Story',
+      acronym: 'F',
+      tagline: 'Golden Storytelling',
+      badgeColor: 'bg-[#f3e0c2] text-[#6a5d45]',
+      cardBg: 'bg-white',
       image: 'https://upload.wikimedia.org/wikipedia/en/8/86/Taylor_Swift_-_Fearless.png',
       spotifyUrl: 'https://open.spotify.com/album/4hDok0OAJd57SGIT8xuWJH'
     },
     {
+      id: '03',
       name: 'Speak Now',
-      acronym: 'SN',
       year: '2010',
-      description: 'Self-written fairy tales',
-      colors: 'from-purple-200 to-pink-200',
-      gradient: 'from-purple-200/80 to-pink-200/80',
-      hoverInfo: 'Most Emotional: Back to December',
+      acronym: 'SN',
+      tagline: 'The Self-Written Fairytale',
+      badgeColor: 'bg-[#f3dbf2] text-[#6b596b]',
+      cardBg: 'bg-white',
       image: 'https://upload.wikimedia.org/wikipedia/en/8/8f/Taylor_Swift_-_Speak_Now_cover.png',
       spotifyUrl: 'https://open.spotify.com/album/5AEDGbliTTfjOB8TSm1sxt'
     },
     {
+      id: '04',
       name: 'Red',
-      acronym: 'R',
       year: '2012',
-      description: 'Autumn leaves and heartbreak',
-      colors: 'from-red-200 to-rose-200',
-      gradient: 'from-red-200/80 to-rose-200/80',
-      hoverInfo: 'Fan Favorite: All Too Well',
+      acronym: 'R',
+      tagline: 'Autumnal Heartbreak',
+      badgeColor: 'bg-red-100 text-red-800',
+      cardBg: 'bg-white',
       image: 'https://upload.wikimedia.org/wikipedia/en/e/e8/Taylor_Swift_-_Red.png',
       spotifyUrl: 'https://open.spotify.com/album/6kZ42qRrzov54LcAk4onW9'
     },
     {
+      id: '05',
       name: '1989',
-      acronym: '89',
       year: '2014',
-      description: 'Synth-pop reinvention',
-      colors: 'from-pink-200 to-blue-200',
-      gradient: 'from-pink-200/80 to-blue-200/80',
-      hoverInfo: 'Most Upbeat: Shake It Off',
-      image: 'https://upload.wikimedia.org/wikipedia/en/f/f6/Taylor_Swift_-_1989.png',
+      acronym: '89',
+      tagline: 'The Pop Renaissance',
+      badgeColor: 'bg-blue-100 text-blue-800',
+      cardBg: 'bg-white',
+      image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR3nrrU0lK_NfcFjc5TnnV5nwL0sx4KKrgJRxyHe2mhK2kI82LDAcWecirP&s=10',
       spotifyUrl: 'https://open.spotify.com/album/1yGbNOtRIgdIiGHOEBaZWf'
     },
     {
+      id: '06',
       name: 'Reputation',
-      acronym: 'REP',
       year: '2017',
-      description: 'Dark and powerful rebirth',
-      colors: 'from-gray-800 to-green-300',
-      gradient: 'from-gray-800/80 to-green-300/80',
-      hoverInfo: 'Most Powerful: Look What You Made Me Do',
-      image: 'https://upload.wikimedia.org/wikipedia/en/f/f2/Taylor_Swift_-_Reputation.png',
+      acronym: 'REP',
+      tagline: 'The Dark Reinvention',
+      badgeColor: 'bg-white/20 text-white',
+      cardBg: 'bg-[#1b1c1a] text-white',
+      image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQRdlaoIHsNSyToLCUuYDC0mkWgpCKgQKppomcPYocEacikIsq_Ztgd6Ds&s=10',
       spotifyUrl: 'https://open.spotify.com/album/6DEjYFkNZh67HP7R9PSZvv'
     },
     {
+      id: '07',
       name: 'Lover',
-      acronym: 'L',
       year: '2019',
-      description: 'Pastel romance and activism',
-      colors: 'from-pink-200 to-cyan-200',
-      gradient: 'from-pink-200/80 to-cyan-200/80',
-      hoverInfo: 'Most Romantic: Lover',
+      acronym: 'L',
+      tagline: 'A love letter to love',
+      badgeColor: 'bg-[#dbdad6] text-[#1b1c1a]',
+      cardBg: 'bg-[#feecf2] text-neutral-800',
       image: 'https://upload.wikimedia.org/wikipedia/en/c/cd/Taylor_Swift_-_Lover.png',
-      spotifyUrl: 'https://open.spotify.com/album/1NAmidJlEaVgA3MpcPFYGq'
+      spotifyUrl: 'https://open.spotify.com/album/6DEjYFkNZh67HP7R9PSZvv'
     },
     {
-      name: 'Folklore',
-      acronym: 'FOLK',
+      id: '08',
+      name: 'folklore', // Note: Title is stylistically kept in all lowercase
       year: '2020',
-      description: 'Indie folk storytelling',
-      colors: 'from-gray-300 to-green-200',
-      gradient: 'from-gray-300/80 to-green-200/80',
-      hoverInfo: 'Critical Acclaim: Cardigan',
+      acronym: 'F',
+      tagline: 'In isolation my imagination has run wild',
+      badgeColor: 'bg-stone-500/20 text-stone-200',
+      cardBg: 'bg-[#2b2b2a] text-[#f4f4f0]',
       image: 'https://upload.wikimedia.org/wikipedia/en/f/f8/Taylor_Swift_-_Folklore.png',
-      spotifyUrl: 'https://open.spotify.com/album/1pzvBxYgT6OVwJLtHkrdQK'
+      spotifyUrl: 'https://spotify.com'
+
     },
     {
-      name: 'Evermore',
-      acronym: 'E',
+      id: '09',
+      name: 'evermore', // Note: Title is stylistically kept in all lowercase
       year: '2020',
-      description: 'Winter sister album',
-      colors: 'from-orange-200 to-green-200',
-      gradient: 'from-orange-200/80 to-green-200/80',
-      hoverInfo: 'Fan Favorite: Willow',
-      image: 'https://upload.wikimedia.org/wikipedia/en/0/0a/Taylor_Swift_-_Evermore.png',
-      spotifyUrl: 'https://open.spotify.com/album/6AORtDjduMM3bupSWzbTSG'
+      acronym: 'E',
+      tagline: 'We couldn’t stop writing songs',
+      badgeColor: 'bg-amber-800/20 text-amber-200',
+      cardBg: 'bg-[#36271c] text-[#f7f4eb]', // Warm, flannel brown and cream cottagecore aesthetic
+      image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSI2PtTOlo-4kxOLqiWv6KzqE1CwefRbDA9Q&s',
+      spotifyUrl: 'https://spotify.com'
+
     },
     {
+      id: '10',
       name: 'Midnights',
-      acronym: 'MN',
       year: '2022',
-      description: 'Sleepless night stories',
-      colors: 'from-indigo-900 to-blue-200',
-      gradient: 'from-indigo-900/80 to-blue-200/80',
-      hoverInfo: 'Record Breaker: Anti-Hero',
-      image: 'https://upload.wikimedia.org/wikipedia/en/9/9f/Midnights_-_Taylor_Swift.png',
-      spotifyUrl: 'https://open.spotify.com/album/151w1FgRZfnKZA9FEcg9Z3'
+      acronym: 'M',
+      tagline: 'Meet me at midnight',
+      badgeColor: 'bg-indigo-900/40 text-indigo-200',
+      cardBg: 'bg-[#0f111a] text-[#e0e4f0]', // Dark, midnight blue and star-lit silver aesthetic
+      image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQYyLBAUSekHazkzbCq0tTIvSozxa25B0ovnA&s',
+      spotifyUrl: 'https://spotify.com'
+
     },
+
     {
-      name: 'The Tortured Poets Department',
-      acronym: 'TTPD',
+      id: '11',
+      name: 'TTPD',
       year: '2024',
-      description: 'Poetic heartbreak anthology',
-      colors: 'from-purple-900 to-gray-400',
-      gradient: 'from-purple-900/80 to-gray-400/80',
-      hoverInfo: 'Most Raw: Fortnight',
-      image: 'https://upload.wikimedia.org/wikipedia/en/1/1b/The_Tortured_Poets_Department_The_Anthology.png',
+      acronym: 'TTPD',
+      tagline: 'The Literary Confession',
+      badgeColor: 'bg-[#dbdad6] text-[#1b1c1a]',
+      cardBg: 'bg-[#faf9f5]',
+      image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSX_PvJIaV6iOgb3GpLjl1Dhdz3WYcVC0OtBtKlQAz5BytNOt7BmICFrunp&s=10',
       spotifyUrl: 'https://open.spotify.com/album/5H7ixXZfsNMGbIE5OBSpcb'
     },
     {
+      id: '12',
       name: 'The Life of a Showgirl',
-      acronym: 'LS',
       year: '2025',
-      description: 'Glamorous showbiz tales',
-      colors: 'from-green-400 to-lime-200',
-      gradient: 'from-green-400/80 to-lime-200/80',
-      hoverInfo: 'Coming Soon...',
-      image: 'https://upload.wikimedia.org/wikipedia/en/f/f4/Taylor_Swift_%E2%80%93_The_Life_of_a_Showgirl_%28album_cover%29.png',
-      spotifyUrl: 'https://open.spotify.com/album/1W57oNaAkGObOQKBTxg4e9'
+      acronym: 'TLOAS', // Alternatively shortened by fans as "Showgirl"
+      tagline: 'What was going on behind the scenes in my inner life',
+      badgeColor: 'bg-orange-500/20 text-orange-200',
+      cardBg: 'bg-[#18312a] text-[#fbf5e9]', // The album's mint green and Portofino orange-glitter aesthetic
+      image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSXJYxAm1P3XfODRxraq2DvnZunRGYS_smORA&s',
+      spotifyUrl: 'https://open.spotify.com/album/4a6NzYL1YHRUgx9e3YZI6I'
+
     },
+
     {
+      id: '14',
       name: 'Toy Story 5',
-      acronym: 'TS5',
       year: '2026',
-      description: 'Animated adventure and happy reunions',
-      colors: 'from-blue-400 to-yellow-300',
-      gradient: 'from-blue-400/80 to-yellow-300/80',
-      hoverInfo: 'Newest Release: I Knew It, I Knew You',
-      image: 'https://m.media-amazon.com/images/M/MV5BMjA0NzYwODg4M15BMl5BanBnXkFtZTgwMDM2MzE4OTE@._V1_.jpg',
+      acronym: 'TS5',
+      tagline: 'Pure Pixar Nostalgia',
+      badgeColor: 'bg-orange-100 text-orange-800',
+      cardBg: 'bg-gradient-to-br from-white to-orange-50',
+      isNew: true,
+      image: 'https://images.fmdb.net/rAiphoHxfVLz3nFreD1Pbpp61TNC6kCdsR7yXSWIwRM/resize:fill:800:0:true/czM6Ly9mbWRiLXBy/b2QvcmVsZWFzZXMv/Ni85LzkvNC84Lzcv/Yy8zLzZhMzEyNWYx/MDVmZjU2OTI4MzQx/MDEuanBn',
       spotifyUrl: '#'
     }
   ];
 
-  const features = [
-    {
-      icon: <Search className="w-8 h-8" />,
-      title: 'Keyword Explorer',
-      description: 'Find hidden patterns and recurring themes across all albums with real-time search',
-      href: '/search',
-      color: 'from-purple-500 to-pink-500',
-      era: 'All Eras'
-    },
-    {
-      icon: <BarChart3 className="w-8 h-8" />,
-      title: 'Sentiment Journey',
-      description: 'Track emotional evolution through advanced RoBERTa AI sentiment analysis',
-      href: '/sentiment',
-      color: 'from-blue-500 to-teal-500',
-      era: 'Emotional Map'
-    },
-    {
-      icon: <TrendingUp className="w-8 h-8" />,
-      title: 'Era Timeline',
-      description: 'Visualize lyrical trends and thematic shifts across 20 years of music',
-      href: '/trends',
-      color: 'from-orange-500 to-red-500',
-      era: '2006-2026'
-    }
-  ];
-
   return (
-    <div className="min-h-screen">
+    <div className="bg-background">
       {/* Hero Section */}
-      <div className="relative py-20 px-4 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-purple-100/50 via-pink-50/30 to-blue-100/50"></div>
-        <div className="relative max-w-6xl mx-auto text-center">
-          <div className="flex justify-center mb-6">
-            <div className="relative">
-              <Music className="w-20 h-20 text-purple-600 floating" />
-              <Sparkles className="absolute -top-2 -right-2 w-6 h-6 text-pink-500 animate-pulse" />
-            </div>
+      <section className="relative h-screen w-full flex items-center justify-center overflow-hidden">
+        <div className="absolute inset-0 z-0">
+          <div className="w-full h-full bg-cover bg-center" style={{ backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuAqxgs3tR4iB8qs-53rsIL5DCfFVUXLfgz10R1_oS6W6WjLbNClyimWYcHLviZpWkde-U0XRZVAMNp0ZTQAzbCbzzs7379c2pOsTsCX_Xa9Id9QOuqPE7Q3Ew_8Gv7tACtc45gOGlV2geYIQ0o-ZVpbcOxz2N3raYYjQ4logBM0sramvD8mQDBKnFwxF_8VimwSe1S1zofT_WeYAtmSKFGA0mTIOVVSRqE4DPGC3TgGaGM8zBLr6WnCBbofDds3Jkntvt9j8AFzlw')" }}></div>
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px]"></div>
+          <div className="absolute inset-0 w-full h-full opacity-30 mix-blend-overlay">
+            <BackgroundShader />
           </div>
+        </div>
 
-          <h1 className="text-7xl font-bold mb-6">
-            <span className="bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 bg-clip-text text-transparent">
-              The Swift Journal
-            </span>
+        <div className="relative z-10 text-center px-margin-mobile max-w-4xl">
+          <h1 className="font-bodoni text-7xl md:text-8xl text-white mb-stack-sm reveal-text italic font-bold">
+            The Swift Journal
           </h1>
-
-          <p className="text-2xl text-gray-700 mb-8 max-w-3xl mx-auto leading-relaxed">
-            Explore <span className="text-purple-600 font-semibold">179 songs</span> across
-            <span className="text-pink-600 font-semibold"> 14 albums</span> with AI-powered
-            sentiment analysis and interactive visualizations
+          <p className="font-dm-sans text-xl md:text-2xl text-white/80 mb-stack-md max-w-2xl mx-auto reveal-text">
+            Explore 179 songs across 14 albums through AI-powered emotional analysis. A cinematic archive for the dedicated listener.
           </p>
-
-          <div className="flex gap-4 justify-center flex-wrap mb-12">
-            <Link
-              href="/search"
-              className="group bg-gradient-to-r from-purple-600 to-pink-600 text-white px-8 py-4 rounded-2xl font-semibold hover:shadow-2xl hover:scale-105 transition-all duration-300 flex items-center gap-3 shadow-lg"
-            >
-              <Sparkles className="w-5 h-5 group-hover:rotate-180 transition-transform duration-500" />
+          <div className="flex flex-col md:flex-row gap-gutter justify-center reveal-text">
+            <Link href="#archives" className="bg-white text-black px-10 py-4 rounded-full font-bold uppercase tracking-widest text-xs hover:scale-105 transition-transform">
               Start Exploring
-              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" />
             </Link>
-            <Link
-              href="/sentiment"
-              className="group border-2 border-purple-600 text-purple-600 px-8 py-4 rounded-2xl font-semibold hover:bg-purple-600 hover:text-white transition-all duration-300 flex items-center gap-3"
-            >
-              <Heart className="w-5 h-5 group-hover:scale-110 transition-transform duration-300" />
+            <Link href="#insights" className="backdrop-blur-md bg-white/10 text-white border border-white/20 px-10 py-4 rounded-full font-bold uppercase tracking-widest text-xs hover:bg-white/20 transition-all">
               View Analysis
             </Link>
           </div>
-
-          {/* Quick Stats */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-2xl mx-auto">
-            {[
-              { number: '179', label: 'Songs', emoji: '🎵' },
-              { number: '14', label: 'Albums', emoji: '💿' },
-              { number: '20', label: 'Years', emoji: '📅' },
-              { number: 'RoBERTa', label: 'AI Analysis', emoji: '🧠' }
-            ].map((stat, index) => (
-              <div key={index} className="bg-white/90 backdrop-blur-sm border border-white/40 shadow-xl rounded-2xl p-4 text-center transition-all duration-500 hover:scale-105 hover:shadow-2xl">
-                <div className="text-2xl font-bold text-gray-800 mb-1">{stat.number}</div>
-                <div className="text-sm text-gray-600 flex items-center justify-center gap-1">
-                  <span>{stat.emoji}</span>
-                  {stat.label}
-                </div>
-              </div>
-            ))}
-          </div>
         </div>
-      </div>
 
-      {/* Eras Showcase - FIXED DESIGN */}
-      <div className="max-w-7xl mx-auto px-4 py-16">
-        <h2 className="text-4xl font-bold text-center text-gray-800 mb-4">
-          Journey Through The Eras
-        </h2>
-        <p className="text-xl text-gray-600 text-center mb-12 max-w-3xl mx-auto">
-          From country beginnings to poetic masterpieces, explore every chapter of Taylor's musical evolution
-        </p>
+        <div className="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce opacity-50">
+          <ChevronDown className="text-white w-12 h-12" />
+        </div>
+      </section>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-          {eras.map((era, index) => (
+      {/* The Eras Archive */}
+      <section className="py-stack-lg px-margin-mobile md:px-margin-desktop bg-surface" id="archives">
+        <div className="mb-stack-lg flex flex-col md:flex-row md:items-end justify-between gap-gutter">
+          <div>
+            <span className="text-primary font-dm-sans font-bold text-xs tracking-widest block mb-2 uppercase">Collection One</span>
+            <h2 className="font-bodoni text-5xl md:text-6xl italic">Museum Exhibits</h2>
+          </div>
+          <p className="font-dm-sans text-on-surface-variant max-w-md text-lg">
+            Every era defined by a distinct sonic landscape and aesthetic evolution. Select an exhibit to dive deep into the lyrical DNA.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-gutter">
+          {eras.map((era) => (
             <a
-              key={index}
+              key={era.id}
               href={era.spotifyUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="group relative h-96 rounded-3xl overflow-hidden shadow-2xl hover:shadow-3xl transition-all duration-700 cursor-pointer transform hover:scale-105 block"
+              className={`museum-card glassmorphism p-8 rounded-lg aspect-[3/4] flex flex-col justify-between group cursor-pointer ${era.cardBg}`}
             >
-              {/* Background Image with Gradient Overlay */}
-              <div
-                className="absolute inset-0 bg-cover bg-center transition-all duration-500 group-hover:scale-110"
-                style={{
-                  backgroundImage: `url('${era.image}')`
-                }}
-              >
-                {/* Darker gradient overlay for better text visibility */}
-                <div className={`absolute inset-0 bg-gradient-to-br ${era.gradient} opacity-70 group-hover:opacity-50 transition-opacity duration-500`}></div>
+              <div className="flex justify-between items-start">
+                <span className={`era-badge ${era.badgeColor}`}>Era {era.id} {era.isNew && "• NEW"}</span>
+                <span className="font-dm-sans font-bold text-xs opacity-50 tracking-widest">{era.year}</span>
               </div>
 
-              {/* Album Acronym Badge */}
-              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10">
-                <div className={`w-24 h-24 rounded-full bg-black/40 backdrop-blur-sm border border-white/30 flex items-center justify-center text-white font-bold text-2xl shadow-2xl transition-all duration-500 group-hover:scale-110 group-hover:bg-black/50`}>
-                  {era.acronym}
-                </div>
+              <div className="text-center py-stack-md flex-grow flex items-center justify-center">
+                <img
+                  className="w-full h-48 object-contain group-hover:scale-110 transition-transform duration-700"
+                  src={era.image}
+                  alt={era.name}
+                />
               </div>
 
-              {/* Bottom Info - Improved contrast */}
-              <div className="absolute bottom-6 left-6 right-6 text-white z-10 transition-all duration-500 group-hover:translate-y-2">
-                <h3 className="text-2xl font-bold mb-1 drop-shadow-2xl text-white">{era.name}</h3>
-                <p className="text-white/95 font-medium drop-shadow-xl">{era.year}</p>
+              <div>
+                <h3 className="font-bodoni font-bold text-2xl mb-1">{era.name}</h3>
+                <p className="font-dm-sans text-on-surface-variant text-[10px] uppercase font-bold tracking-widest">{era.tagline}</p>
               </div>
-
-              {/* Hover Overlay */}
-              <div className="absolute inset-0 bg-black/70 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-all duration-500 flex items-center justify-center p-6 z-20">
-                <div className="text-center text-white transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
-                  <div className="w-16 h-16 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 flex items-center justify-center text-white font-bold text-xl mb-4 mx-auto">
-                    {era.acronym}
-                  </div>
-                  <h3 className="text-2xl font-bold mb-2 text-white">{era.name}</h3>
-                  <p className="text-white/90 mb-3">{era.year} • {era.description}</p>
-                  <p className="text-white/80 text-sm italic">{era.hoverInfo}</p>
-                </div>
-              </div>
-
-              {/* 3D Shadow Effect */}
-              <div className="absolute inset-0 rounded-3xl shadow-2xl transition-all duration-500 group-hover:shadow-3xl"></div>
             </a>
           ))}
         </div>
-      </div>
+      </section>
 
-      {/* Features Grid */}
-      <div className="max-w-6xl mx-auto px-4 py-16">
-        <h2 className="text-4xl font-bold text-center text-gray-800 mb-4">
-          Discover Hidden Stories
-        </h2>
-        <p className="text-xl text-gray-600 text-center mb-12">
-          Advanced tools to explore Taylor's lyrical universe
-        </p>
+      {/* Research & Insights Section */}
+      <section className="py-stack-lg px-margin-mobile md:px-margin-desktop bg-surface-container-low border-y border-outline-variant/20" id="insights">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-gutter">
+          <div className="lg:col-span-1">
+            <span className="text-primary font-dm-sans font-bold text-xs tracking-widest block mb-4 uppercase">Data Methodology</span>
+            <h2 className="font-bodoni text-5xl mb-stack-md leading-tight">
+              Decoding the <br />
+              <span className="italic text-primary text-7xl inline-block mt-2">Lyrics</span>
+            </h2>
+            <p className="font-dm-sans text-on-surface-variant text-lg">
+              We utilize advanced NLP models (RoBERTa) to map the emotional trajectory of every verse Taylor has ever written. Our research highlights the intersection of poetry and pop culture through a data-driven lens.
+            </p>
+          </div>
 
-        <div className="grid md:grid-cols-3 gap-8">
-          {features.map((feature, index) => (
-            <Link
-              key={index}
-              href={feature.href}
-              className="group block"
-            >
-              <div className="bg-white/90 backdrop-blur-sm border border-white/40 shadow-xl rounded-2xl p-8 h-full relative overflow-hidden transition-all duration-500 hover:scale-105 hover:shadow-2xl">
-                <div className={`absolute top-4 right-4 px-3 py-1 rounded-full text-xs font-semibold bg-gradient-to-r ${feature.color} text-white`}>
-                  {feature.era}
-                </div>
-
-                <div className={`w-16 h-16 rounded-2xl bg-gradient-to-r ${feature.color} flex items-center justify-center text-white mb-6 group-hover:scale-110 transition-transform duration-300`}>
-                  {feature.icon}
-                </div>
-
-                <h3 className="text-2xl font-bold text-gray-800 mb-3">
-                  {feature.title}
-                </h3>
-
-                <p className="text-gray-600 mb-6 leading-relaxed">
-                  {feature.description}
-                </p>
-
-                <div className="flex items-center text-purple-600 font-semibold group-hover:gap-3 transition-all duration-300">
-                  Explore Era
-                  <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform duration-300" />
-                </div>
-
-                <div className={`absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r ${feature.color} transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500`}></div>
+          <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-gutter">
+            {/* Research Card 1 */}
+            <Link href="/search" className="bg-surface glassmorphism p-10 rounded-lg flex flex-col justify-between hover:shadow-xl transition-all border border-outline-variant/30 group">
+              <div>
+                <Search className="text-primary mb-6 w-10 h-10" />
+                <h4 className="font-bodoni font-bold text-2xl mb-4">Keyword Explorer</h4>
+                <p className="font-dm-sans text-on-surface-variant leading-relaxed">Deep-dive into recurring motifs: "Midnights", "Rain", and "Red". Track how themes evolve from 2006 to 2026.</p>
+              </div>
+              <div className="mt-stack-sm flex items-center gap-2 text-primary font-bold text-xs uppercase tracking-widest group-hover:gap-4 transition-all">
+                Launch Explorer <ArrowRight className="w-4 h-4" />
               </div>
             </Link>
-          ))}
+
+            {/* Research Card 2 */}
+            <Link href="/sentiment" className="bg-surface glassmorphism p-10 rounded-lg flex flex-col justify-between hover:shadow-xl transition-all border border-outline-variant/30 group">
+              <div>
+                <BarChart3 className="text-primary mb-6 w-10 h-10" />
+                <h4 className="font-bodoni font-bold text-2xl mb-4">Emotional Map</h4>
+                <p className="font-dm-sans text-on-surface-variant leading-relaxed">Visualizing the emotional highs and lows. See the shift from teenage melancholy to adult introspection.</p>
+              </div>
+              <div className="mt-stack-sm flex items-center gap-2 text-primary font-bold text-xs uppercase tracking-widest group-hover:gap-4 transition-all">
+                View Visualizations <ArrowRight className="w-4 h-4" />
+              </div>
+            </Link>
+          </div>
         </div>
-      </div>
+      </section>
 
-      {/* CTA Section */}
-      <div className="bg-gradient-to-br from-pink-100 via-purple-100 to-blue-100 border-t border-pink-200 py-16">
-        <div className="max-w-4xl mx-auto text-center px-4">
-          <Star className="w-12 h-12 text-pink-500 mx-auto mb-6 floating" />
-          <h3 className="text-3xl font-bold text-gray-800 mb-4">
-            Ready to Dive Into the Lyrics?
-          </h3>
-          <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-
-          </p>
-          <Link
-            href="/search"
-            className="inline-flex items-center gap-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white px-8 py-4 rounded-2xl font-semibold hover:shadow-2xl hover:scale-105 transition-all duration-300 shadow-lg"
-          >
-            <Sparkles className="w-5 h-5" />
-            Begin Your Journey
-            <Music className="w-5 h-5" />
+      {/* Final CTA Section */}
+      <section className="relative h-[60vh] flex items-center justify-center bg-inverse-surface overflow-hidden">
+        <div className="absolute inset-0 opacity-20">
+          <BackgroundShader />
+        </div>
+        <div className="relative z-10 text-center px-margin-mobile">
+          <h2 className="font-bodoni text-6xl md:text-7xl text-white mb-stack-md italic font-bold">Ready to Dive Into <br />The Lyrics?</h2>
+          <Link href="/search" className="bg-primary text-on-primary px-12 py-5 rounded-full font-bold uppercase tracking-widest text-xs hover:bg-white hover:text-black transition-all transform hover:scale-110 inline-block shadow-2xl">
+            Open The Vault
           </Link>
         </div>
-      </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="w-full py-stack-lg px-margin-mobile md:px-margin-desktop bg-surface-container-lowest border-t border-outline-variant/30 grid grid-cols-1 md:grid-cols-2 gap-gutter items-center">
+        <div>
+          <div className="font-bodoni font-bold text-3xl text-on-surface mb-2">The Swift Journal</div>
+          <p className="text-on-surface-variant font-dm-sans text-base">© 2026 The Swift Journal. Built for the Eras.</p>
+        </div>
+        <div className="flex flex-wrap gap-x-8 gap-y-4 md:justify-end">
+          <Link className="text-on-surface-variant hover:text-primary font-dm-sans text-sm transition-all hover:underline decoration-primary/30 underline-offset-4" href="#">Editorial Policy</Link>
+          <Link className="text-on-surface-variant hover:text-primary font-dm-sans text-sm transition-all hover:underline decoration-primary/30 underline-offset-4" href="#">Era Archive</Link>
+          <Link className="text-on-surface-variant hover:text-primary font-dm-sans text-sm transition-all hover:underline decoration-primary/30 underline-offset-4" href="#">Data Methodology</Link>
+          <Link className="text-on-surface-variant hover:text-primary font-dm-sans text-sm transition-all hover:underline decoration-primary/30 underline-offset-4" href="#">Privacy</Link>
+        </div>
+      </footer>
     </div>
   );
 }

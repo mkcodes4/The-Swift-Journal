@@ -1,23 +1,24 @@
 import type { Metadata } from 'next'
-import { Inter, Playfair_Display } from 'next/font/google'
+import { Bodoni_Moda, DM_Sans } from 'next/font/google'
 import './globals.css'
 import Header from '@/components/Header'
 import ChatAgent from '@/components/ChatAgent'
 
-const inter = Inter({
+const bodoni = Bodoni_Moda({
   subsets: ['latin'],
-  variable: '--font-inter'
+  variable: '--font-bodoni',
+  display: 'swap',
 })
 
-const playfair = Playfair_Display({
+const dmSans = DM_Sans({
   subsets: ['latin'],
-  variable: '--font-playfair'
+  variable: '--font-dm-sans',
+  display: 'swap',
 })
 
 export const metadata: Metadata = {
-  title: 'Taylor Swift Lyrics Analyzer - Explore Her Musical Journey',
-  description: 'Dive deep into Taylor Swift\'s lyrics with AI-powered sentiment analysis, keyword exploration, and interactive visualizations across all eras.',
-  keywords: 'Taylor Swift, lyrics analysis, sentiment analysis, music analytics, Swiftie',
+  title: 'The Swift Journal — A Digital Museum',
+  description: 'Explore 179 songs across 14 albums through AI-powered emotional analysis. A cinematic archive for the dedicated listener.',
 }
 
 export default function RootLayout({
@@ -26,28 +27,15 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" className={`${inter.variable} ${playfair.variable}`}>
-      <body className="font-sans ts-gradient min-h-screen">
+    <html lang="en" className={`${bodoni.variable} ${dmSans.variable} scroll-smooth`}>
+      <head>
+        <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+      </head>
+      <body className="font-dm-sans bg-background text-on-surface paper-grain overflow-x-hidden min-h-screen">
         <Header />
-        <div className="relative">
-          {/* Floating sparkles */}
-          <div className="fixed inset-0 pointer-events-none">
-            {[...Array(20)].map((_, i) => (
-              <div
-                key={i}
-                className="absolute sparkle floating"
-                style={{
-                  left: `${Math.random() * 100}%`,
-                  animationDelay: `${Math.random() * 6}s`,
-                  animationDuration: `${4 + Math.random() * 4}s`,
-                  width: `${2 + Math.random() * 4}px`,
-                  height: `${2 + Math.random() * 4}px`,
-                }}
-              />
-            ))}
-          </div>
+        <main className="relative z-10">
           {children}
-        </div>
+        </main>
         <ChatAgent />
       </body>
     </html>

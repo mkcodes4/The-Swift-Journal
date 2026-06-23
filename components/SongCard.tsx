@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Music, Heart, Star, Sparkles, Quote, Search } from 'lucide-react';
+import { Music, Heart, Star, Sparkles, Quote, Search, Activity, TrendingUp } from 'lucide-react';
 import Confetti from './Confetti';
 import { getEraColor, getSentimentColor } from '@/lib/utils';
 
@@ -21,17 +21,18 @@ interface SongCardProps {
   count?: number;
 }
 
-export default function SongCard({ song, keyword, count }: SongCardProps) {
+export default function SongCard({ song, keyword, count, onOpenExhibit }: SongCardProps & { onOpenExhibit?: (song: any) => void }) {
   const [showConfetti, setShowConfetti] = useState(false);
-  const [isExpanded, setIsExpanded] = useState(false);
   const eraColors = getEraColor(song.album);
 
-  const handleCelebration = () => {
+  const handleClick = () => {
     if (song.roberta_label === 'positive' && song.roberta_confidence > 0.8) {
       setShowConfetti(true);
       setTimeout(() => setShowConfetti(false), 3000);
     }
-    setIsExpanded(!isExpanded);
+    if (onOpenExhibit) {
+      onOpenExhibit(song);
+    }
   };
 
   const getSentimentIcon = (sentiment: string) => {
@@ -60,7 +61,7 @@ export default function SongCard({ song, keyword, count }: SongCardProps) {
       }
     });
 
-    return keywordLines.slice(0, 3); // Return first 3 matching lines
+    return keywordLines.slice(0, 2); // Return first 2 matching lines for a cleaner card
   };
 
   // Function to highlight keywords in text
@@ -73,7 +74,7 @@ export default function SongCard({ song, keyword, count }: SongCardProps) {
     keywords.forEach(kw => {
       if (kw) {
         const regex = new RegExp(`(${kw})`, 'gi');
-        highlightedText = highlightedText.replace(regex, '<mark class="bg-yellow-200 text-gray-900 px-1 rounded font-semibold">$1</mark>');
+        highlightedText = highlightedText.replace(regex, '<mark class="bg-yellow-200/60 text-gray-900 px-1 rounded font-semibold">$1</mark>');
       }
     });
 
@@ -86,100 +87,57 @@ export default function SongCard({ song, keyword, count }: SongCardProps) {
   return (
     <>
       {showConfetti && <Confetti />}
-      
-      <div 
-        className={`lyric-card ${eraColors.border} cursor-pointer group relative overflow-hidden`}
-        onClick={handleCelebration}
+
+      <div
+        className={`museum-card p-6 rounded-2xl bg-white/80 backdrop-blur-md border ${eraColors.border} cursor-pointer group relative overflow-hidden shadow-sm hover:shadow-xl transition-all duration-500`}
+        onClick={handleClick}
       >
         {/* Era background tint */}
-        <div className={`absolute inset-0 ${eraColors.bg} opacity-5 group-hover:opacity-10 transition-opacity duration-300`}></div>
+        <div className={`absolute inset-0 ${eraColors.bg} opacity-[0.03] group-hover:opacity-[0.08] transition-opacity duration-500`}></div>
 
-        {/* Sparkle effect for positive high-confidence songs */}
-        {song.roberta_label === 'positive' && song.roberta_confidence > 0.7 && (
-          <Sparkles className="absolute top-3 right-3 w-4 h-4 text-yellow-500 animate-pulse" />
-        )}
-
+        {/* Top bar */}
         <div className="relative z-10">
-          <div className="flex items-start justify-between mb-3">
+          <div className="flex items-start justify-between mb-4">
             <div className="flex-1">
-              <h3 className="font-bold text-lg text-gray-800 group-hover:text-purple-700 transition-colors">
+              <span className={`era-badge ${eraColors.bg} ${eraColors.text} mb-2 inline-block`}>Exhibit No. {song.year}</span>
+              <h3 className="font-bodoni font-bold text-xl text-on-surface group-hover:text-primary transition-colors leading-tight">
                 {song.title}
               </h3>
-              <p className="text-sm text-gray-600 mt-1">
-                {song.album} • {song.year}
+              <p className="text-xs text-on-surface-variant font-medium mt-1 tracking-tight">
+                {song.album}
               </p>
             </div>
-            <div className="flex items-center gap-1">
+            <div className="flex flex-col items-end gap-2">
               {getSentimentIcon(song.roberta_label)}
+              <div className="text-[10px] font-bold text-on-surface-variant/40 tracking-widest">{((song.roberta_confidence || 0) * 100).toFixed(0)}%</div>
             </div>
           </div>
 
-          {/* Sentiment Badge */}
-          <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium mb-3 ${getSentimentColor(song.roberta_label)}`}>
-            <span className="capitalize">{song.roberta_label}</span>
-            <span className="text-xs opacity-75">
-              {(song.roberta_confidence * 100).toFixed(0)}%
-            </span>
-          </div>
-
-          {/* Keyword Highlight */}
-          {keyword && count && count > 0 && (
-            <div className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-3 py-1 rounded-full text-sm font-semibold mb-3 inline-flex items-center gap-2">
-              <Search className="w-3 h-3" />
-              "{keyword}" × {count}
-            </div>
-          )}
-
-          {/* Keyword Match Preview (always show if there are matches) */}
+          {/* Keyword Match Preview */}
           {hasKeywordMatches && (
-            <div className="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-              <div className="flex items-center gap-2 mb-2">
-                <Search className="w-3 h-3 text-yellow-600" />
-                <span className="text-xs font-semibold text-yellow-700">Keyword Matches:</span>
-              </div>
-              <div className="space-y-1">
-                {keywordLines.map((line, index) => (
-                  <p 
-                    key={index}
-                    className="text-xs text-gray-700 italic leading-relaxed"
-                    dangerouslySetInnerHTML={{ __html: highlightKeywords(line) }}
-                  />
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Expanded Lyrics */}
-          {isExpanded && (
-            <div className="mt-4 p-4 bg-white/50 rounded-lg border border-purple-100">
-              <div className="flex items-center gap-2 mb-2">
-                <Quote className="w-4 h-4 text-purple-500" />
-                <span className="text-sm font-semibold text-purple-600">Lyrics Preview</span>
-              </div>
-              <div className="max-h-40 overflow-y-auto">
-                <p 
-                  className="text-sm text-gray-700 leading-relaxed"
-                  dangerouslySetInnerHTML={{ 
-                    __html: highlightKeywords(song.lyrics.slice(0, 300) + (song.lyrics.length > 300 ? '...' : ''))
-                  }}
+            <div className="mt-4 mb-4 space-y-2">
+              {keywordLines.map((line, index) => (
+                <p
+                  key={index}
+                  className="text-xs text-on-surface-variant italic leading-relaxed line-clamp-2 border-l-2 border-primary/20 pl-3"
+                  dangerouslySetInnerHTML={{ __html: highlightKeywords(line) }}
                 />
-              </div>
-              <div className="flex gap-4 mt-3 text-xs text-gray-500">
-                <span>Words: {song.word_count}</span>
-                <span>Sentiment: {song.roberta_compound > 0 ? '+' : ''}{song.roberta_compound.toFixed(3)}</span>
-              </div>
+              ))}
             </div>
           )}
 
-          {/* Show hint if expanded but no keyword matches found */}
-          {isExpanded && keyword && !hasKeywordMatches && (
-            <div className="mt-2 p-2 bg-gray-50 border border-gray-200 rounded text-xs text-gray-600 text-center">
-              💡 Keyword found in other parts of the lyrics
+          {/* Collection Status */}
+          <div className="flex items-center justify-between mt-auto pt-4 border-t border-outline-variant/30">
+            <div className="flex items-center gap-2">
+              <Activity className="w-3 h-3 text-primary/60" />
+              <span className="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant/60">
+                Data Point {song.word_count}
+              </span>
             </div>
-          )}
-
-          {/* Hover effect */}
-          <div className="absolute inset-0 border-2 border-transparent group-hover:border-purple-300/50 rounded-xl transition-all duration-300 pointer-events-none"></div>
+            <div className="group-hover:translate-x-1 transition-transform">
+              <TrendingUp className="w-4 h-4 text-primary" />
+            </div>
+          </div>
         </div>
       </div>
     </>
