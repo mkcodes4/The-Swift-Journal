@@ -1,5 +1,6 @@
 import os
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from dotenv import load_dotenv
 from agents.coordinator import SwiftieCoordinator
@@ -12,6 +13,19 @@ from core.memory import ChatMemory
 load_dotenv()
 
 app = FastAPI(title="Swiftie Multi-Agent API")
+
+# --- CORS ---
+# In production, restrict to your Vercel domain via the ALLOWED_ORIGIN env var.
+# Locally, all origins are permitted so development stays seamless.
+allowed_origin = os.getenv("ALLOWED_ORIGIN", "*")
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[allowed_origin] if allowed_origin != "*" else ["*"],
+    allow_credentials=False,
+    allow_methods=["GET", "POST"],
+    allow_headers=["Content-Type"],
+)
+
 
 # Initialize Shared State
 API_KEY = os.getenv("GOOGLE_GENERATIVE_AI_API_KEY")

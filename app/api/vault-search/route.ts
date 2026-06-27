@@ -47,8 +47,19 @@ export async function POST(request: Request) {
             }, { status: 200 });
         }
 
+        // Resolve the Python backend URL from env (falls back to localhost for local dev)
+        const backendUrl = process.env.PYTHON_BACKEND_URL || 'http://localhost:8000';
+
+        if (!process.env.PYTHON_BACKEND_URL && process.env.NODE_ENV === 'production') {
+            console.error('PYTHON_BACKEND_URL is not set in production environment.');
+            return NextResponse.json(
+                { status: 'error', message: 'The Vault Search engine is not configured. Set PYTHON_BACKEND_URL in your environment variables.' },
+                { status: 503 }
+            );
+        }
+
         // Proceed to the Python Vault Search Engine
-        const response = await fetch('http://localhost:8000/search', {
+        const response = await fetch(`${backendUrl}/search`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

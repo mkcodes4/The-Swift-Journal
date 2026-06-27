@@ -3,7 +3,7 @@
 import { useChat } from 'ai/react';
 import type { Message } from 'ai';
 import { useState, useRef, useEffect } from 'react';
-import { Archive, X, Send, Bot, Minimize2 } from 'lucide-react';
+import { X, Send, Bot, Minimize2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 function ChatMessageContent({ content, role }: { content: string; role: Message['role'] }) {
@@ -69,8 +69,8 @@ export default function ChatAgent() {
                         {/* Header */}
                         <div className="p-5 bg-[#F7F4EE] text-[#1F1B18] flex justify-between items-center border-b border-[#E5E2E0]">
                             <div className="flex items-center space-x-3">
-                                <div className="p-2 bg-[#1F1B18] rounded-sm">
-                                    <Archive className="w-5 h-5 text-[#C7A45D]" />
+                                <div className="flex h-9 w-9 items-center justify-center">
+                                    <Bot className="w-6 h-6 text-[#C7A45D]" />
                                 </div>
                                 <div>
                                     <h3 className="font-headline text-lg italic leading-none">Swiftie-AI</h3>
@@ -165,17 +165,16 @@ export default function ChatAgent() {
                 whileHover={{ scale: 1.05, y: -2 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setIsOpen(!isOpen)}
-                className="w-16 h-16 bg-gradient-to-br from-purple-600 via-purple-500 to-pink-500 rounded-2xl shadow-xl shadow-purple-500/20 flex items-center justify-center text-white relative group overflow-hidden"
+                className="w-16 h-16 bg-[#F7F4EE] border border-[#D8D1C8] rounded-md shadow-xl shadow-[#1F1B18]/15 flex items-center justify-center text-[#1F1B18] relative group overflow-hidden"
             >
-                {/* Particle effects on hover */}
-                <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity" />
-                <div className="absolute -inset-1 bg-gradient-to-r from-purple-600 to-pink-600 rounded-2xl blur-lg opacity-40 group-hover:opacity-80 transition duration-500"></div>
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(199,164,93,0.24),transparent_34%),linear-gradient(135deg,rgba(255,255,255,0.8),rgba(229,226,224,0.42))]" />
+                <div className="absolute inset-2 rounded-sm border border-[#1F1B18]/10 transition-all duration-300 group-hover:inset-1.5 group-hover:border-[#1F1B18]/25" />
                 {isOpen ? (
-                    <Minimize2 className="w-7 h-7 z-10 animate-in spin-in-90 duration-300" />
+                    <Minimize2 className="w-7 h-7 z-10 animate-in spin-in-90 duration-300 text-[#1F1B18]" />
                 ) : (
                     <div className="relative z-10 flex flex-col items-center">
-                        <Bot className="w-7 h-7" />
-                        <div className="h-0.5 w-1 bg-white rounded-full mt-0.5 animate-pulse" />
+                        <Bot className="w-7 h-7 text-[#1F1B18]" />
+                        <div className="mt-0.5 h-0.5 w-1 rounded-full bg-[#1F1B18] animate-pulse" />
                     </div>
                 )}
             </motion.button>

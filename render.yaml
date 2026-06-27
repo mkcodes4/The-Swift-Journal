@@ -1,0 +1,26 @@
+# =========================================================
+# Render.com deployment config for the Python FastAPI backend
+# =========================================================
+# How to deploy:
+#   1. Push this repo to GitHub (the server/ folder is included)
+#   2. Go to https://render.com → New → Web Service
+#   3. Connect your GitHub repo
+#   4. Render will auto-detect this file and use these settings
+#   5. Add environment variables in Render Dashboard:
+#        GOOGLE_GENERATIVE_AI_API_KEY = your real key
+#        ALLOWED_ORIGIN = https://your-project.vercel.app
+# =========================================================
+
+services:
+  - type: web
+    name: swift-journal-backend
+    runtime: python
+    rootDir: server
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: GOOGLE_GENERATIVE_AI_API_KEY
+        sync: false          # Set manually in Render dashboard (never hardcode)
+      - key: ALLOWED_ORIGIN
+        sync: false          # Set to your Vercel URL e.g. https://the-swift-journal.vercel.app
+    plan: free

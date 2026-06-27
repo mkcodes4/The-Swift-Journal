@@ -61,6 +61,16 @@
     clip-path: polygon(0% 0%, 100% 0%, 100% 98%, 98% 100%, 95% 98%, 92% 100%, 89% 98%, 85% 100%, 82% 98%, 78% 100%, 75% 98%, 72% 100%, 68% 98%, 65% 100%, 62% 98%, 58% 100%, 55% 98%, 52% 100%, 48% 98%, 45% 100%, 42% 98%, 38% 100%, 35% 98%, 32% 100%, 28% 98%, 25% 100%, 22% 98%, 18% 100%, 15% 98%, 12% 100%, 8% 98%, 5% 100%, 2% 98%, 0% 100%);
   }
 
+  .museum-card {
+    transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1), box-shadow 0.6s ease;
+    transform-style: preserve-3d;
+  }
+
+  .museum-card:hover {
+    transform: perspective(1000px) rotateX(4deg) rotateY(-4deg) translateY(-8px);
+    box-shadow: 0 40px 80px -20px rgba(80, 98, 91, 0.2);
+  }
+
   .scroll-reveal {
     opacity: 0;
     transform: translateY(20px);

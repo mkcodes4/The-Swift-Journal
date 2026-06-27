@@ -22,6 +22,44 @@ const CLEANUP_REPLIES = [
     'Really, dude? Rephrase it cleanly and we are back in business.',
 ];
 
+// --- Rate Limiting ---
+const RATE_LIMIT_MAX = 10;         // max requests
+const RATE_LIMIT_WINDOW_MS = 60_000; // per 60 seconds
+const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
+
+function getRateLimitIp(req: Request): string {
+    // Vercel forwards the real IP in x-forwarded-for
+    const forwarded = req.headers.get('x-forwarded-for');
+    return (forwarded ? forwarded.split(',')[0] : 'unknown').trim();
+}
+
+function isRateLimited(ip: string): boolean {
+    const now = Date.now();
+    const entry = rateLimitMap.get(ip);
+
+    if (!entry || now > entry.resetAt) {
+        rateLimitMap.set(ip, { count: 1, resetAt: now + RATE_LIMIT_WINDOW_MS });
+        return false;
+    }
+
+    if (entry.count >= RATE_LIMIT_MAX) return true;
+
+    entry.count++;
+    return false;
+}
+
+// Periodic cleanup to prevent memory leaks in long-running instances
+setInterval(() => {
+    const now = Date.now();
+    for (const [ip, entry] of rateLimitMap.entries()) {
+        if (now > entry.resetAt) rateLimitMap.delete(ip);
+    }
+}, 5 * 60_000);
+
+// --- Input Limits ---
+const MAX_MESSAGES = 20;
+const MAX_MESSAGE_LENGTH = 2000;
+
 type LyricSong = {
     title: string;
     album: string;
@@ -165,7 +203,48 @@ function appendSources(text: string, sources: LyricSource[]): string {
 
 export async function POST(req: Request) {
     try {
-        const { messages } = await req.json();
+        // --- Rate Limit Check ---
+        const ip = getRateLimitIp(req);
+        if (isRateLimited(ip)) {
+            return Response.json(
+                { error: 'Too many requests. Please wait a moment before sending another message.' },
+                { status: 429 }
+            );
+        }
+
+        // --- Parse & Validate Input ---
+        let body: { messages?: unknown };
+        try {
+            body = await req.json();
+        } catch {
+            return Response.json({ error: 'Invalid JSON in request body.' }, { status: 400 });
+        }
+
+        const { messages } = body;
+
+        if (!Array.isArray(messages) || messages.length === 0) {
+            return Response.json({ error: 'messages must be a non-empty array.' }, { status: 400 });
+        }
+
+        if (messages.length > MAX_MESSAGES) {
+            return Response.json(
+                { error: `Too many messages in context. Maximum allowed is ${MAX_MESSAGES}.` },
+                { status: 400 }
+            );
+        }
+
+        for (const msg of messages) {
+            if (typeof msg?.content !== 'string') {
+                return Response.json({ error: 'Each message must have a string content field.' }, { status: 400 });
+            }
+            if (msg.content.length > MAX_MESSAGE_LENGTH) {
+                return Response.json(
+                    { error: `Message too long. Maximum ${MAX_MESSAGE_LENGTH} characters per message.` },
+                    { status: 400 }
+                );
+            }
+        }
+
         const apiKey = process.env.GOOGLE_GENERATIVE_AI_API_KEY || '';
 
         if (!apiKey) {
@@ -175,7 +254,7 @@ export async function POST(req: Request) {
             );
         }
 
-        const lastUserMessage = messages[messages.length - 1].content;
+        const lastUserMessage = (messages[messages.length - 1] as { role: string; content: string }).content;
 
         if (hasBlockedLanguage(lastUserMessage)) {
             return streamText(getCleanupReply(lastUserMessage));
