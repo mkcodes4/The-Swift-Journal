@@ -46,6 +46,15 @@ next-env.d.ts
 notebooks/
 server/cache/
 
+# Legacy data files (keep local only)
+data/taylor_swift_fusion_analysis.json
+data/taylor_swift_roberta_analysis.csv
+data/taylor_swift_roberta_analysis.json
+data/taylor_swift_roberta_analysis_v2.json
+data/taylor_swift_roberta_summary.json
+server/data/taylor_swift_roberta_analysis.json
+server/data/taylor_swift_roberta_analysis_v2.json
+
 # Python
 venv/
 __pycache__/
