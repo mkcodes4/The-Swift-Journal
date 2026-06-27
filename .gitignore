@@ -45,7 +45,6 @@ next-env.d.ts
 # project-specific
 notebooks/
 server/cache/
-data/
 
 # Python
 venv/
