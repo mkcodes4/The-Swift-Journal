@@ -69,7 +69,7 @@ export default function SearchPage() {
         if (data.status === 'success') {
           setVaultResults(data.matches);
           setIsBlocked(false);
-        } else if (data.status === 'blocked') {
+        } else if (data.status === 'blocked' || data.status === 'error') {
           setVaultResults([]);
           setIsBlocked(true);
           setBlockMessage(data.message);
