@@ -6,7 +6,6 @@ This project is a deep dive into the lyrical world of Taylor Swift's discography
 At its core, this is a personal passion project. The main purpose was to learn and experiment with data analysis, discovering firsthand how code can be used to uncover patterns in unstructured text and transform raw lyrics into measurable insights.
 
 ## What I Learned
-Building this project was a fantastic hands-on experience. Throughout the process, I developed skills in:
 * **Data Cleaning:** Processing messy, unstructured text data (lyrics) into clean, usable formats.
 * **Data Exploration:** Understanding datasets and finding hidden patterns across different eras and albums.
 * **Data Visualization:** Translating numbers and text into charts and visual insights.
